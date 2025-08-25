@@ -3,6 +3,7 @@ I am an MCP server that provides some services on a MooseModel
 I wait for commands on a TCP socket and answer them
 
 To use just do:
+- load a model in Moose
 ```
 server := MMCPServer new.
 server start.
@@ -74,6 +75,38 @@ MMCPServer >> initialize [
 	self mooseModel: self defaultMooseModel.
 
 	self resetLog.
+]
+
+{ #category : 'commands-server' }
+MMCPServer >> initializeProtocol: protocolVersion capabilities: capabilities client: clientInfo [
+
+	"MCP initialization message:
+
+	{
+		""method"":""initialize"",
+			""params"":{
+				""protocolVersion"":""2025-06-18"",
+				""capabilities"":{},
+				""clientInfo"":{
+					""name"":""mcp"",
+					""version"":""0.1.0""
+				}
+			},
+		""jsonrpc"":""2.0"",
+		""id"":0
+	}"
+
+	<jrpc: #initialize>
+
+	self log: (
+		'initialize connection:' , protocolVersion asString ,
+		' capabilities:' , capabilities asString ,
+		' clientInfo:' , clientInfo asString).
+
+	^ '{"protocolVersion":"2025-06-18","capabilities":{"tools":{}},"serverInfo":{"name":"mooseMCP","version":"0.1.0"}}, "jsonrpc":"2.0"}'
+
+
+
 ]
 
 { #category : 'commands-list' }
