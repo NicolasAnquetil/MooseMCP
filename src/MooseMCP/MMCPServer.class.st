@@ -138,6 +138,16 @@ MMCPServer >> requestModelName [
 ]
 
 { #category : 'commands-requests' }
+MMCPServer >> requestModelRepository [
+
+	<jrpc: #request:modelRepository>
+
+	self log: 'request:modelRepository'.
+
+	^'https://github.com/NicolasAnquetil/VerveineJ'
+]
+
+{ #category : 'commands-requests' }
 MMCPServer >> requestModelSize [
 
 	<jrpc: #request:modelSize>
