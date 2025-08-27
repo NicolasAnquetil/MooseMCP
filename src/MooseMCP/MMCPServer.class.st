@@ -110,15 +110,19 @@ MMCPServer >> initializeProtocol: protocolVersion capabilities: capabilities cli
 ]
 
 { #category : 'commands-list' }
-MMCPServer >> listEntitiesType: aFamixClassName [
+MMCPServer >> listEntitiesForType: aName [
 
-	<jrpc: #list:entityType>
+	<jrpc: #list:entitiesForType>
 
-	self log: ('list:entityType for ' , aFamixClassName).
+	self log: ('list:entitiesForType: ' , aName).
 
-	^(Smalltalk classNamed: aFamixClassName)
-		ifNil: [ nil ]
-		ifNotNil: [ :famixClass | mooseModel allWithType: famixClass ]
+	^mooseModel metamodel classes
+		detect: [ :c | c name = aName ]
+		ifOne: [ :fmClass |
+			(mooseModel allWithType: fmClass implementingClass) collect: #mooseName
+		]
+		ifNone: [ #() ]
+
 ]
 
 { #category : 'commands-list' }
@@ -128,8 +132,18 @@ MMCPServer >> listEntityChildren: aFamixEntityName [
 
 	self log: ('list:entityChildren for ', aFamixEntityName).
 
-	^(mooseModel entityNamed: aFamixEntityName ifAbsent: [^nil])
+	^(mooseModel entityNamed: aFamixEntityName ifAbsent: [^#()])
 		children collect: #mooseName
+]
+
+{ #category : 'commands-list' }
+MMCPServer >> listEntityTypes [
+
+	<jrpc: #list:entityTypes>
+
+	self log: 'list:entityTypes'.
+
+	^mooseModel metamodel classes select: #isFM3Class thenCollect: #name
 ]
 
 { #category : 'utilities' }
@@ -148,16 +162,6 @@ MMCPServer >> mooseModel [
 MMCPServer >> mooseModel: anObject [
 
 	mooseModel := anObject
-]
-
-{ #category : 'commands-requests' }
-MMCPServer >> requestEntityTypes [
-
-	<jrpc: #request:entityTypes>
-
-	self log: 'request:entityTypes'.
-
-	^mooseModel entities collectAsSet: [ :e | e class name ]
 ]
 
 { #category : 'commands-requests' }
