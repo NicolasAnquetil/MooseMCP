@@ -1,0 +1,46 @@
+@startuml
+actor Client
+
+Server -> Server : initialize
+activate Server
+Server -> JRPCMessageProcessor : addHandlersFromPragmasIn://server//
+activate JRPCMessageProcessor
+JRPCMessageProcessor -> Server : Pragma
+activate Server
+return //method//
+JRPCMessageProcessor -> JRPCMessageSendHandler ** : new receiver://server// selector://method//
+deactivate JRPCMessageProcessor
+deactivate Server
+
+Client -> Server : handleJSON://jsonString//
+activate Server
+Server -> JRPCMessageProcessor : handleJSON://jsonString//
+activate JRPCMessageProcessor
+JRPCMessageProcessor -> JRPCRequestObject ** : beHandledBy://messageProcessor//
+activate JRPCRequestObject
+JRPCRequestObject -> JRPCMessageProcessor : handleJRPCRequestObject://requestObject//
+activate JRPCMessageProcessor
+JRPCMessageProcessor -> JRPCMessageProcessor : handlerFor://request//
+activate JRPCMessageProcessor
+return //messageSendHandler//
+JRPCMessageProcessor -> JRPCMessageSendHandler : executeWithArguments://args//
+activate JRPCMessageSendHandler
+JRPCMessageSendHandler -> JRPCMessageSendHandler : send://selector// to://server// with://args//
+activate JRPCMessageSendHandler
+JRPCMessageSendHandler -> Server : perform:withArguments:
+activate Server
+return //result//
+deactivate JRPCMessageSendHandler
+return //result//
+JRPCMessageProcessor -> JRPCSuccessResponseObject ** : new result://result//
+return //responseObject//
+return //responseObject//
+JRPCMessageProcessor -> JRPCSuccessResponseObject : beConvertedBy://messageProcessor//
+activate JRPCSuccessResponseObject
+JRPCSuccessResponseObject -> JRPCMessageProcessor : convertJRPCJsonableObjectToJSON://responseObject//
+activate JRPCMessageProcessor
+return //jsonString//
+return //jsonString//
+return //jsonString//
+return //jsonString//
+@enduml
