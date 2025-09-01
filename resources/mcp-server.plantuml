@@ -1,0 +1,30 @@
+@startuml
+actor "End User" as endUser
+participant "Moose JRCP server" as moose
+participant "mooseMCPClient.py" as pythonClient
+participant "mooseMCPServer.py" as pythonServer
+participant LLM
+
+endUser -> moose **
+endUser -> pythonClient **
+activate pythonClient
+pythonClient -> pythonServer **
+pythonClient -> pythonServer : getTools()
+activate pythonServer
+return //mcp tool list//
+pythonClient -> LLM **
+pythonClient -> LLM : //set MCP server//
+pythonClient -> LLM : //set mcp tool list//
+
+endUser -> pythonClient : //query//
+pythonClient -> LLM : //query//
+activate LLM
+LLM -> pythonServer : //call mcp tool//
+activate pythonServer
+pythonServer -> moose : //tool//
+activate moose
+return //answer//
+return //answer//
+return //answer//
+return //answer//
+@enduml
