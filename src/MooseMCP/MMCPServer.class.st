@@ -12,9 +12,10 @@ server start.
 "
 Class {
 	#name : 'MMCPServer',
-	#superclass : 'JRPCTCPServer',
+	#superclass : 'JRPCHTTPServer',
 	#instVars : [
-		'mooseModel'
+		'mooseModel',
+		'formatter'
 	],
 	#category : 'MooseMCP',
 	#package : 'MooseMCP'
@@ -24,6 +25,22 @@ Class {
 MMCPServer class >> defaultPort [
 
 	^ 4444
+]
+
+{ #category : 'accessing' }
+MMCPServer >> byID [
+
+	formatter := MMCPServerById new
+		mooseModel: mooseModel ;
+		yourself
+]
+
+{ #category : 'accessing' }
+MMCPServer >> byName [
+
+	formatter := MMCPServerByName new
+		mooseModel: mooseModel ;
+		yourself
 ]
 
 { #category : 'commands-server' }
@@ -75,6 +92,7 @@ MMCPServer >> initialize [
 	self mooseModel: self defaultMooseModel.
 
 	self resetLog.
+	self byName
 ]
 
 { #category : 'commands-server' }
@@ -117,23 +135,24 @@ MMCPServer >> listEntitiesForType: aName [
 	self log: ('list:entitiesForType: ' , aName).
 
 	^mooseModel metamodel classes
-		detect: [ :c | c name = aName ]
+		detect: [ :c | c name sameAs: aName ]
 		ifOne: [ :fmClass |
-			(mooseModel allWithType: fmClass implementingClass) collect: #mooseName
+			(mooseModel allWithType: fmClass implementingClass)
+				reject: #isStub
 		]
-		ifNone: [ #() ]
+		ifNone: [ #() ].
 
 ]
 
 { #category : 'commands-list' }
-MMCPServer >> listEntityChildren: aFamixEntityName [
+MMCPServer >> listEntityChildren: anEntity [
 
 	<jrpc: #list:entityChildren>
 
-	self log: ('list:entityChildren for ', aFamixEntityName).
+	self log: ('list:entityChildren for ', anEntity).
 
-	^(mooseModel entityNamed: aFamixEntityName ifAbsent: [^#()])
-		children collect: #mooseName
+	^(formatter getEntity: anEntity ifAbsent: [^#()])
+		children
 ]
 
 { #category : 'commands-list' }
@@ -143,7 +162,9 @@ MMCPServer >> listEntityTypes [
 
 	self log: 'list:entityTypes'.
 
-	^mooseModel metamodel classes select: #isFM3Class thenCollect: #name
+	^mooseModel entityStorage allEntityTypes collect: [ :pharoClass |
+		(mooseModel metamodel fmTypeOf: pharoClass) name
+	]
 ]
 
 { #category : 'utilities' }
@@ -162,6 +183,12 @@ MMCPServer >> mooseModel [
 MMCPServer >> mooseModel: anObject [
 
 	mooseModel := anObject
+]
+
+{ #category : 'message performing' }
+MMCPServer >> perform: selector withArguments: argArray [
+
+	^formatter resultFormat: (super perform: selector withArguments: argArray)
 ]
 
 { #category : 'commands-requests' }
