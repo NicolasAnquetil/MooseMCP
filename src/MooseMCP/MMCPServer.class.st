@@ -104,7 +104,7 @@ MMCPServer >> initializeProtocol: protocolVersion capabilities: capabilities cli
 		""method"":""initialize"",
 			""params"":{
 				""protocolVersion"":""2025-06-18"",
-				""capabilities"":{},
+				""capabilities"":{""elicitation"": {}},
 				""clientInfo"":{
 					""name"":""mcp"",
 					""version"":""0.1.0""
@@ -121,7 +121,7 @@ MMCPServer >> initializeProtocol: protocolVersion capabilities: capabilities cli
 		' capabilities:' , capabilities asString ,
 		' clientInfo:' , clientInfo asString).
 
-	^ '{"protocolVersion":"2025-06-18","capabilities":{"tools":{}},"serverInfo":{"name":"mooseMCP","version":"0.1.0"}}, "jsonrpc":"2.0"}'
+	^ ''
 
 
 
@@ -153,6 +153,39 @@ MMCPServer >> listEntityChildren: anEntity [
 
 	^(formatter getEntity: anEntity ifAbsent: [^#()])
 		children
+]
+
+{ #category : 'commands-list' }
+MMCPServer >> listEntityClients: anEntity [
+
+	<jrpc: #list:entityClients>
+
+	self log: ('list:entityClients for ', anEntity).
+
+	^(formatter getEntity: anEntity ifAbsent: [^#()])
+		allClients
+]
+
+{ #category : 'commands-list' }
+MMCPServer >> listEntityParents: anEntity [
+
+	<jrpc: #list:entityParents>
+
+	self log: ('list:entityParents for ', anEntity).
+
+	^(formatter getEntity: anEntity ifAbsent: [^#()])
+		parents
+]
+
+{ #category : 'commands-list' }
+MMCPServer >> listEntityProviders: anEntity [
+
+	<jrpc: #list:entityProviders>
+
+	self log: ('list:entityProviders for ', anEntity).
+
+	^(formatter getEntity: anEntity ifAbsent: [^#()])
+		allProviders
 ]
 
 { #category : 'commands-list' }
@@ -189,6 +222,28 @@ MMCPServer >> mooseModel: anObject [
 MMCPServer >> perform: selector withArguments: argArray [
 
 	^formatter resultFormat: (super perform: selector withArguments: argArray)
+]
+
+{ #category : 'commands-requests' }
+MMCPServer >> requestEntityName: anEntity [
+
+	<jrpc: #request:entityName>
+
+	self log: 'request:entityName for : ' , anEntity.
+
+	^(formatter getEntity: anEntity ifAbsent: [^#()])
+		mooseName
+]
+
+{ #category : 'commands-requests' }
+MMCPServer >> requestEntityType: anEntity [
+
+	<jrpc: #request:entityType>
+
+	self log: 'request:entityType for : ' , anEntity.
+
+	^(formatter getEntity: anEntity ifAbsent: [^#()])
+		class name
 ]
 
 { #category : 'commands-requests' }
