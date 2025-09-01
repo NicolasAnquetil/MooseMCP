@@ -26,9 +26,9 @@ The overall interaction is the following:
   - `mooseMCPServer.py` forwards the call to Moose JRCP server
   - answer is returned to the End User
 
-<img width="618" height="695" alt="image" src="https://github.com/user-attachments/assets/7facd347-60fc-456f-8716-8f8295029a5b" />
+<img width="618" height="695" alt="pharo-jrcp-uml of the use of the Moose MCP server" src="resources/mcp-server.png" />
 
 # JRPC server
 
 For reference, this is the UML sequence diagram of how a JRPC server works in Pharo:
-<img width="1380" height="997" alt="pharo-jrcp-uml" src="https://github.com/user-attachments/assets/2d7f6f9e-1a08-4537-9f01-f9f2e6dbadfe" />
+<img width="1380" height="997" alt="UML sequence diagram for processing a JRCP request in Pharo" src="resources/pharo-jrcp-uml.png" />
