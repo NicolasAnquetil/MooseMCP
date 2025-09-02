@@ -21,12 +21,12 @@ The overall interaction is the following:
 - `mooseMCPClient.py` registers the `mooseMCPServer.py` and the list of its MCP tools into the LLM
 - `mooseMCPClient.py` starts an interaction loop with the user
   - End User asks a question
-  - `mooseMCPClient.py` forwards the qustion to the LLM
-  - LLM decide what MCP tool it needs and calls it (in the `mooseMCPServer.py`)
-  - `mooseMCPServer.py` forwards the call to Moose JRCP server
+  - `mooseMCPClient.py` forwards the question to the LLM
+  - LLM decide what MCP tool(s) it needs and calls it (them) in the `mooseMCPServer.py`
+  - `mooseMCPServer.py` forwards the call(s) to the Moose JRCP server
   - answer is returned to the End User
 
-<img width="618" height="695" alt="pharo-jrcp-uml of the use of the Moose MCP server" src="resources/mcp-server.png" />
+<img width="618" height="695" alt="pharo-jrcp-uml of the use of the Moose MCP server" src="resources/mcp-server.svg" />
 
 # JRPC server
 
