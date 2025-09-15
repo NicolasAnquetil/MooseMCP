@@ -231,7 +231,7 @@ MMCPServer >> requestEntityName: anEntity [
 
 	<jrpc: #request:entityName>
 
-	self log: 'request:entityName for : ' , anEntity.
+	self log: 'request:entityName for : ' , anEntity asString.
 
 	^(formatter getEntity: anEntity ifAbsent: [^#()])
 		mooseName
