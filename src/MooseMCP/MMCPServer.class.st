@@ -92,6 +92,7 @@ MMCPServer >> initialize [
 	self addHandlersFromPragmasIn: self.
 
 	self mooseModel: self defaultMooseModel.
+	memory := Dictionary new.
 
 	self resetLog.
 	self byName
@@ -206,6 +207,27 @@ MMCPServer >> listEntityTypes [
 MMCPServer >> log: aString [
 
 	aString record
+]
+
+{ #category : 'commands-memory' }
+MMCPServer >> memoryGet: aName [
+
+	<jrpc: #memory:get>
+
+	self log: ('memory:get for ', aName asString).
+
+	^memory at: aName ifAbsent: [ Error signal: 'No list named ', aName ,' found' ]
+]
+
+{ #category : 'commands-memory' }
+MMCPServer >> memorySet: aName entities: aCollection [
+
+	<jrpc: #memory:set>
+
+	self log: ('memory:set ', aName asString, ' value: ' , aCollection asString).
+
+	memory at: aName put: aCollection.
+	^aCollection size
 ]
 
 { #category : 'accessing' }
