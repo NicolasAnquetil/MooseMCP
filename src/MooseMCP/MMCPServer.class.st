@@ -248,6 +248,71 @@ MMCPServer >> perform: selector withArguments: argArray [
 	^formatter resultFormat: (super perform: selector withArguments: argArray)
 ]
 
+{ #category : 'commands-property' }
+MMCPServer >> propertyClassLackOfCohesion: anEntity [
+
+	<jrpc: #property:classLackOfCohesion>
+
+	| aClass |
+	self log: 'property:classLackOfCohesion for : ' , anEntity asString.
+
+	aClass := (formatter getEntity: anEntity).
+	aClass isClass ifFalse: [ Error signal: 'Entity is not a class'  ].
+	^aClass lcom3 
+]
+
+{ #category : 'commands-property' }
+MMCPServer >> propertyMethodCyclomaticComplexity: anEntity [
+
+	<jrpc: #property:methodCyclomaticComplexity>
+
+	| aClass |
+	self log: 'property:methodCyclomaticComplexity for : ' , anEntity asString.
+
+	aClass := (formatter getEntity: anEntity).
+	aClass isMethod ifFalse: [ Error signal: 'Entity is not a method'  ].
+	^aClass cyclomaticComplexity 
+]
+
+{ #category : 'commands-property' }
+MMCPServer >> propertyMethodNumberOfStatements: anEntity [
+
+	<jrpc: #property:methodNumberOfStatements>
+
+	| aClass |
+	self log: 'property:methodNumberOfStatements for : ' , anEntity asString.
+
+	aClass := (formatter getEntity: anEntity).
+	aClass isMethod ifFalse: [ Error signal: 'Entity is not a method'  ].
+	^aClass numberOfStatements 
+]
+
+{ #category : 'commands-property' }
+MMCPServer >> propertyPackageCohesion: anEntity [
+
+	<jrpc: #property:packageCohesion>
+
+	| package |
+	self log: 'property:packageCohesion for : ' , anEntity asString.
+
+	package := (formatter getEntity: anEntity).
+	package isPackage ifFalse: [ Error signal: 'Entity is not a package' ].
+	^package martinCohesion 
+]
+
+{ #category : 'commands-property' }
+MMCPServer >> propertyPackageCoupling: anEntity [
+
+	<jrpc: #property:packageCoupling>
+
+	| package |
+	self log: 'property:packageCoupling for : ' , anEntity asString.
+
+	package := (formatter getEntity: anEntity).
+	package isPackage ifFalse: [ Error signal: 'Entity is not a package' ].
+	^package efferentCoupling 
+]
+
 { #category : 'commands-requests' }
 MMCPServer >> requestEntityName: anEntity [
 
