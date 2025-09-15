@@ -6,6 +6,12 @@ Class {
 }
 
 { #category : 'utilities' }
+MMCPServerById >> getEntity: aName [
+
+	^mooseModel entityNamed: aName ifAbsent: [ Error signal: 'Could not find entity' ]
+]
+
+{ #category : 'utilities' }
 MMCPServerById >> getEntity: anID ifAbsent: aBlock [
 
 	^mooseModel entityStorage

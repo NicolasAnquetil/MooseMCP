@@ -9,6 +9,12 @@ Class {
 }
 
 { #category : 'utilities' }
+MMCPServerFormatter >> getEntity: aFamixEntityName [
+
+	self subclassResponsibility 
+]
+
+{ #category : 'utilities' }
 MMCPServerFormatter >> getEntity: aFamixEntityName ifAbsent: aBlock [
 
 	self subclassResponsibility 

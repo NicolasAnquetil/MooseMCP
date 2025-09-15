@@ -15,7 +15,8 @@ Class {
 	#superclass : 'JRPCHTTPServer',
 	#instVars : [
 		'mooseModel',
-		'formatter'
+		'formatter',
+		'memory'
 	],
 	#category : 'MooseMCP',
 	#package : 'MooseMCP'
@@ -66,7 +67,8 @@ MMCPServer >> commandServerStop [
 
 	self log: 'command:serverStop'.
 
-	self stop
+	self stop.
+	^nil
 ]
 
 { #category : 'accessing' }
@@ -149,9 +151,9 @@ MMCPServer >> listEntityChildren: anEntity [
 
 	<jrpc: #list:entityChildren>
 
-	self log: ('list:entityChildren for ', anEntity).
+	self log: ('list:entityChildren for ', anEntity asString).
 
-	^(formatter getEntity: anEntity ifAbsent: [^#()])
+	^(formatter getEntity: anEntity)
 		children
 ]
 
@@ -162,7 +164,7 @@ MMCPServer >> listEntityClients: anEntity [
 
 	self log: ('list:entityClients for ', anEntity).
 
-	^(formatter getEntity: anEntity ifAbsent: [^#()])
+	^(formatter getEntity: anEntity)
 		allClients
 ]
 
@@ -171,9 +173,9 @@ MMCPServer >> listEntityParents: anEntity [
 
 	<jrpc: #list:entityParents>
 
-	self log: ('list:entityParents for ', anEntity).
+	self log: ('list:entityParents for ', anEntity asString).
 
-	^(formatter getEntity: anEntity ifAbsent: [^#()])
+	^(formatter getEntity: anEntity)
 		parents
 ]
 
@@ -182,9 +184,9 @@ MMCPServer >> listEntityProviders: anEntity [
 
 	<jrpc: #list:entityProviders>
 
-	self log: ('list:entityProviders for ', anEntity).
+	self log: ('list:entityProviders for ', anEntity asString).
 
-	^(formatter getEntity: anEntity ifAbsent: [^#()])
+	^(formatter getEntity: anEntity)
 		allProviders
 ]
 
@@ -240,7 +242,7 @@ MMCPServer >> requestEntityType: anEntity [
 
 	<jrpc: #request:entityType>
 
-	self log: 'request:entityType for : ' , anEntity.
+	self log: 'request:entityType for : ' , anEntity asString.
 
 	^(formatter getEntity: anEntity ifAbsent: [^#()])
 		class name
