@@ -8,6 +8,8 @@ dependencies = [
     "dotenv>=0.9.9",
     "langchain-groq>=0.3.7",
     "langchain-mcp-adapters>=0.1.9",
+    "langchain-mistralai>=0.2.11",
     "langgraph>=0.6.6",
     "mcp>=1.13.1",
+    "requests>=2.32.5",
 ]
