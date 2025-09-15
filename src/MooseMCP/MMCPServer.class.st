@@ -449,3 +449,35 @@ MMCPServer >> resetLog [
 	('working on mooseModel: ' , self mooseModel name) record.
 	(self messageProcessor handlersCount asString , ' handlers registered') record.
 ]
+
+{ #category : 'resources' }
+MMCPServer >> resourceModelReport [
+
+	<jrpc: #'resource:model-report'>
+
+	| reporter |
+	self log: 'resource:model-report'.
+
+	reporter := MiModelReportModel new.
+	reporter 	initializeSettings.
+	reporter mooseModel: mooseModel.
+	^String streamContents: [ :st |
+		reporter report: st.
+		reporter document.
+		reporter report
+	]
+]
+
+{ #category : 'resources' }
+MMCPServer >> resourcePackageDSM [
+
+	<jrpc: #'resource:package-dsm'>
+
+	self log: 'resource:package-dsm'.
+
+	"browser := MiDSMBrowser new.
+	browser followEntity: (mooseModel allModelPackages reject: [ :p | p types isEmpty ]).
+	browser diagram canvas exportToPNG"
+
+	^'/home/anquetil/Pharo/images/MooseMCP-250827/3934457036066856.png' asFileReference contents
+]
