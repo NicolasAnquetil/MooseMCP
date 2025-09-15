@@ -28,6 +28,26 @@ MMCPServer class >> defaultPort [
 	^ 4444
 ]
 
+{ #category : 'utilities' }
+MMCPServer >> asBooleanPropery: prop for: entity [
+	"Make a boolean from any property
+	 - for booleans, return their value
+	 - for collection, return false if they are empty, true if not
+	 - for relations to FamixObject (hasOpposite), return false if it's nil, true otherwise
+	 - otherwise (Numbers, Strings) return false if it's not nil"
+
+	| value |
+	value := entity perform: prop name.
+
+	prop type class = FM3Boolean ifTrue: [ ^value ].
+
+	prop isMultivalued ifTrue: [ ^value isNotEmpty ].
+
+	prop hasOpposite ifTrue: [ ^value isNotNil ].
+
+	^value isNotNil
+]
+
 { #category : 'accessing' }
 MMCPServer >> byID [
 
@@ -181,6 +201,20 @@ MMCPServer >> listEntityParents: anEntity [
 ]
 
 { #category : 'commands-list' }
+MMCPServer >> listEntityProperties: anEntity [
+
+	<jrpc: #list:entityProperties>
+
+	| entity |
+	self log: 'list:entityProperties : ' , anEntity asString.
+
+	entity := (formatter getEntity: anEntity).
+
+	^entity allProperties collect: [ :prop | prop name , ' : ' , (prop comment ifNil: ['']) ]
+
+]
+
+{ #category : 'commands-list' }
 MMCPServer >> listEntityProviders: anEntity [
 
 	<jrpc: #list:entityProviders>
@@ -201,6 +235,22 @@ MMCPServer >> listEntityTypes [
 	^mooseModel entityStorage allEntityTypes collect: [ :pharoClass |
 		(mooseModel metamodel fmTypeOf: pharoClass) name
 	]
+]
+
+{ #category : 'commands-list' }
+MMCPServer >> listPropertiesForType: aName [
+
+	<jrpc: #list:propertiesForType>
+
+	self log: ('list:propertiesForType ' , aName).
+
+	^mooseModel metamodel classes
+		detect: [ :c | c name sameAs: aName ]
+		ifOne: [ :fmClass |
+			fmClass allProperties collect: [ :prop | prop name , ' : ' , (prop comment ifNil: ['']) ]
+		]
+		ifNone: [ #() ].
+
 ]
 
 { #category : 'utilities' }
@@ -248,6 +298,14 @@ MMCPServer >> perform: selector withArguments: argArray [
 	^formatter resultFormat: (super perform: selector withArguments: argArray)
 ]
 
+{ #category : 'utilities' }
+MMCPServer >> property: prop matchesName: aPropertyName [
+
+	(prop name sameAs: aPropertyName) ifTrue: [ ^true ].
+
+	^(prop name sameAs: ('is' , aPropertyName))
+]
+
 { #category : 'commands-property' }
 MMCPServer >> propertyClassLackOfCohesion: anEntity [
 
@@ -259,6 +317,23 @@ MMCPServer >> propertyClassLackOfCohesion: anEntity [
 	aClass := (formatter getEntity: anEntity).
 	aClass isClass ifFalse: [ Error signal: 'Entity is not a class'  ].
 	^aClass lcom3 
+]
+
+{ #category : 'commands-property' }
+MMCPServer >> propertyHas: anEntity property: aPropertyName [
+
+	<jrpc: #property:hasProperty>
+
+	| entity |
+	self log: 'property:has : ' , anEntity asString , ' property: ' , aPropertyName.
+
+	entity := (formatter getEntity: anEntity).
+
+	^entity allDeclaredProperties
+		detect: [ :prop | self property: prop matchesName: aPropertyName ]
+		ifOne: [ :prop | self asBooleanPropery: prop for: entity ]
+		ifNone: [ false ]
+
 ]
 
 { #category : 'commands-property' }
