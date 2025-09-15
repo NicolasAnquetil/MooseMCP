@@ -27,9 +27,11 @@ async def interaction_loop():
      - Print answer"""
 
     while True:
+        print("=========================================================================")
         question = input("Question: ")
         if (question == "quit"): break
-        llm_answer = await mcp_question(question)
+        moose_answer = await agent.ainvoke( {"messages" : [{"role": "user", "content": question}]} )
+        llm_answer = moose_answer["messages"][-1].content
         print(f"Answer: {llm_answer}")
 
     return
@@ -45,10 +47,10 @@ async def main():
     global agent
 
     server_configs = {
-#           "MyMathServer": { "command": ".venv/bin/python", "args": ["./mathserver.py"], "transport": "stdio" },
-#            "MyWeatherServer": { "transport": "streamable_http", "url": "http://localhost:4444" }
-            "MooseMCPServer": { "command": ".venv/bin/python", "args": ["./mooseMCPServer.py"], "transport": "stdio" },
-        }
+        "MathServer": { "command": ".venv/bin/python", "args": ["./mathServer.py"], "transport": "stdio" },
+        "MooseMCPServer": { "command": ".venv/bin/python", "args": ["./mooseMCPServer.py"], "transport": "stdio" },
+#        "MyWeatherServer": { "transport": "streamable_http", "url": "http://localhost:4444" }
+    }
     client=MultiServerMCPClient(server_configs)
 
     import os
