@@ -1,12 +1,12 @@
 Class {
-	#name : 'BaselineofMooseMCP',
+	#name : 'BaselineOfMooseMCP',
 	#superclass : 'BaselineOf',
 	#category : 'BaselineOfMooseMCP',
 	#package : 'BaselineOfMooseMCP'
 }
 
 { #category : 'baselines' }
-BaselineofMooseMCP >> baseline: spec [
+BaselineOfMooseMCP >> baseline: spec [
 
 	<baseline>
 	spec for: #common do: [
@@ -17,7 +17,7 @@ BaselineofMooseMCP >> baseline: spec [
 ]
 
 { #category : 'packages' }
-BaselineofMooseMCP >> defineDependencies: spec [
+BaselineOfMooseMCP >> defineDependencies: spec [
 
 	spec
 		baseline: 'JRPC'
@@ -28,14 +28,14 @@ BaselineofMooseMCP >> defineDependencies: spec [
 ]
 
 { #category : 'packages' }
-BaselineofMooseMCP >> defineGroups: spec [
+BaselineOfMooseMCP >> defineGroups: spec [
 
 	spec
 		group: 'default' with: #( 'MooseMCP' )
 ]
 
 { #category : 'packages' }
-BaselineofMooseMCP >> definePackages: spec [
+BaselineOfMooseMCP >> definePackages: spec [
 
 	spec
 		package: 'MooseMCP' with: [ spec requires: #( JRPC ) ]
