@@ -151,6 +151,28 @@ MMCPServer >> initializeProtocol: protocolVersion capabilities: capabilities cli
 ]
 
 { #category : 'commands-list' }
+MMCPServer >> listAccessedEntities: aSourceMethod [
+
+	<jrpc: #list:accessedEntites>
+
+	self log: ('list:accessedEntites for ', aSourceMethod).
+
+	^(formatter getEntity: aSourceMethod)
+		accesses collect: #variable
+]
+
+{ #category : 'commands-list' }
+MMCPServer >> listAccessingMethods: aTargetEntity [
+
+	<jrpc: #list:accessingMethods>
+
+	self log: ('list:accessingMethods for ', aTargetEntity).
+
+	^(formatter getEntity: aTargetEntity)
+		incomingAccesses collect: #accessor
+]
+
+{ #category : 'commands-list' }
 MMCPServer >> listEntitiesForType: aName [
 
 	<jrpc: #list:entitiesForType>
@@ -238,6 +260,50 @@ MMCPServer >> listEntityTypes [
 ]
 
 { #category : 'commands-list' }
+MMCPServer >> listImplementedInterface: aClass [
+
+	<jrpc: #list:implementedInterfaces>
+
+	self log: ('list:implementedInterfaces for ', aClass).
+
+	^(formatter getEntity: aClass)
+		interfaceImplementations collect: #interface 
+]
+
+{ #category : 'commands-list' }
+MMCPServer >> listImplementingClasses: anInterface [
+
+	<jrpc: #list:implementingClasses>
+
+	self log: ('list:implementingClasses for ', anInterface).
+
+	^(formatter getEntity: anInterface)
+		implementations collect: #implementingClass 
+]
+
+{ #category : 'commands-list' }
+MMCPServer >> listInvokedMethods: aSourceMethod [
+
+	<jrpc: #list:invokedMethods>
+
+	self log: ('list:invokedMethods for ', aSourceMethod).
+
+	^(formatter getEntity: aSourceMethod)
+		invokedMethods 
+]
+
+{ #category : 'commands-list' }
+MMCPServer >> listInvokingMethods: aTargetMethod [
+
+	<jrpc: #list:invokingMethods>
+
+	self log: ('list:invokingMethods for ', aTargetMethod).
+
+	^(formatter getEntity: aTargetMethod)
+		invokingMethods 
+]
+
+{ #category : 'commands-list' }
 MMCPServer >> listPropertiesForType: aName [
 
 	<jrpc: #list:propertiesForType>
@@ -251,6 +317,28 @@ MMCPServer >> listPropertiesForType: aName [
 		]
 		ifNone: [ #() ].
 
+]
+
+{ #category : 'commands-list' }
+MMCPServer >> listSubClasses: aSuperClass [
+
+	<jrpc: #list:subClasses>
+
+	self log: ('list:subClasses for ', aSuperClass).
+
+	^(formatter getEntity: aSuperClass)
+		subInheritances collect: #subclass 
+]
+
+{ #category : 'commands-list' }
+MMCPServer >> listSuperClasses: aSuperClass [
+
+	<jrpc: #list:superClasses>
+
+	self log: ('list:superClasses for ', aSuperClass).
+
+	^(formatter getEntity: aSuperClass)
+		superInheritances collect: #superclass 
 ]
 
 { #category : 'utilities' }
@@ -451,21 +539,19 @@ MMCPServer >> resetLog [
 ]
 
 { #category : 'resources' }
-MMCPServer >> resourceModelReport [
+MMCPServer >> resourceModelReport: jsonSettings [
 
 	<jrpc: #'resource:model-report'>
 
 	| reporter |
-	self log: 'resource:model-report'.
+	self log: 'resource:model-report: ' , jsonSettings asString.
 
 	reporter := MiModelReportModel new.
-	reporter 	initializeSettings.
+	reporter 	updateFromConfiguration: (MiModelReportSettingsConfiguration fromJson: jsonSettings).
 	reporter mooseModel: mooseModel.
-	^String streamContents: [ :st |
-		reporter report: st.
-		reporter document.
-		reporter report
-	]
+	reporter document.
+	^reporter rawReport
+
 ]
 
 { #category : 'resources' }
