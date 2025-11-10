@@ -64,7 +64,7 @@ MMCPServer >> byName [
 		yourself
 ]
 
-{ #category : 'commands-server' }
+{ #category : 'tools-server' }
 MMCPServer >> commandMooseMCPServerVersion [
 
 	<jrpc: #'command:version'>
@@ -72,7 +72,7 @@ MMCPServer >> commandMooseMCPServerVersion [
 	^ '0.1.0'
 ]
 
-{ #category : 'commands-server' }
+{ #category : 'tools-server' }
 MMCPServer >> commandPharoQuit [
 
 	<jrpc: #command:pharoQuit>
@@ -80,7 +80,7 @@ MMCPServer >> commandPharoQuit [
 	SmalltalkImage current snapshot: true andQuit: true
 ]
 
-{ #category : 'commands-server' }
+{ #category : 'tools-server' }
 MMCPServer >> commandServerStop [
 
 	<jrpc: #command:serverStop>
@@ -118,7 +118,7 @@ MMCPServer >> initialize [
 	self byName
 ]
 
-{ #category : 'commands-server' }
+{ #category : 'tools-server' }
 MMCPServer >> initializeProtocol: protocolVersion capabilities: capabilities client: clientInfo [
 
 	"MCP initialization message:
@@ -150,7 +150,7 @@ MMCPServer >> initializeProtocol: protocolVersion capabilities: capabilities cli
 
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listAccessedEntities: aSourceMethod [
 
 	<jrpc: #list:accessedEntites>
@@ -161,7 +161,7 @@ MMCPServer >> listAccessedEntities: aSourceMethod [
 		accesses collect: #variable
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listAccessingMethods: aTargetEntity [
 
 	<jrpc: #list:accessingMethods>
@@ -172,7 +172,7 @@ MMCPServer >> listAccessingMethods: aTargetEntity [
 		incomingAccesses collect: #accessor
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listEntitiesForType: aName [
 
 	<jrpc: #list:entitiesForType>
@@ -189,7 +189,7 @@ MMCPServer >> listEntitiesForType: aName [
 
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listEntityChildren: anEntity [
 
 	<jrpc: #list:entityChildren>
@@ -200,7 +200,7 @@ MMCPServer >> listEntityChildren: anEntity [
 		children
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listEntityClients: anEntity [
 
 	<jrpc: #list:entityClients>
@@ -211,7 +211,7 @@ MMCPServer >> listEntityClients: anEntity [
 		allClients
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listEntityParents: anEntity [
 
 	<jrpc: #list:entityParents>
@@ -222,7 +222,7 @@ MMCPServer >> listEntityParents: anEntity [
 		parents
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listEntityProperties: anEntity [
 
 	<jrpc: #list:entityProperties>
@@ -236,7 +236,7 @@ MMCPServer >> listEntityProperties: anEntity [
 
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listEntityProviders: anEntity [
 
 	<jrpc: #list:entityProviders>
@@ -247,7 +247,7 @@ MMCPServer >> listEntityProviders: anEntity [
 		allProviders
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listEntityTypes [
 
 	<jrpc: #list:entityTypes>
@@ -259,7 +259,7 @@ MMCPServer >> listEntityTypes [
 	]
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listImplementedInterface: aClass [
 
 	<jrpc: #list:implementedInterfaces>
@@ -270,7 +270,7 @@ MMCPServer >> listImplementedInterface: aClass [
 		interfaceImplementations collect: #interface 
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listImplementingClasses: anInterface [
 
 	<jrpc: #list:implementingClasses>
@@ -281,7 +281,7 @@ MMCPServer >> listImplementingClasses: anInterface [
 		implementations collect: #implementingClass 
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listInvokedMethods: aSourceMethod [
 
 	<jrpc: #list:invokedMethods>
@@ -292,7 +292,7 @@ MMCPServer >> listInvokedMethods: aSourceMethod [
 		invokedMethods 
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listInvokingMethods: aTargetMethod [
 
 	<jrpc: #list:invokingMethods>
@@ -303,7 +303,7 @@ MMCPServer >> listInvokingMethods: aTargetMethod [
 		invokingMethods 
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listPropertiesForType: aName [
 
 	<jrpc: #list:propertiesForType>
@@ -319,7 +319,7 @@ MMCPServer >> listPropertiesForType: aName [
 
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listSubClasses: aSuperClass [
 
 	<jrpc: #list:subClasses>
@@ -330,7 +330,7 @@ MMCPServer >> listSubClasses: aSuperClass [
 		subInheritances collect: #subclass 
 ]
 
-{ #category : 'commands-list' }
+{ #category : 'tools-list' }
 MMCPServer >> listSuperClasses: aSuperClass [
 
 	<jrpc: #list:superClasses>
@@ -347,7 +347,7 @@ MMCPServer >> log: aString [
 	aString record
 ]
 
-{ #category : 'commands-memory' }
+{ #category : 'tools-memory' }
 MMCPServer >> memoryGet: aName [
 
 	<jrpc: #memory:get>
@@ -357,7 +357,7 @@ MMCPServer >> memoryGet: aName [
 	^memory at: aName ifAbsent: [ Error signal: 'No list named ', aName ,' found' ]
 ]
 
-{ #category : 'commands-memory' }
+{ #category : 'tools-memory' }
 MMCPServer >> memorySet: aName entities: aCollection [
 
 	<jrpc: #memory:set>
@@ -394,7 +394,7 @@ MMCPServer >> property: prop matchesName: aPropertyName [
 	^(prop name sameAs: ('is' , aPropertyName))
 ]
 
-{ #category : 'commands-property' }
+{ #category : 'tools-property' }
 MMCPServer >> propertyClassLackOfCohesion: anEntity [
 
 	<jrpc: #property:classLackOfCohesion>
@@ -407,7 +407,7 @@ MMCPServer >> propertyClassLackOfCohesion: anEntity [
 	^aClass lcom3 
 ]
 
-{ #category : 'commands-property' }
+{ #category : 'tools-property' }
 MMCPServer >> propertyHas: anEntity property: aPropertyName [
 
 	<jrpc: #property:hasProperty>
@@ -424,7 +424,7 @@ MMCPServer >> propertyHas: anEntity property: aPropertyName [
 
 ]
 
-{ #category : 'commands-property' }
+{ #category : 'tools-property' }
 MMCPServer >> propertyMethodCyclomaticComplexity: anEntity [
 
 	<jrpc: #property:methodCyclomaticComplexity>
@@ -437,7 +437,7 @@ MMCPServer >> propertyMethodCyclomaticComplexity: anEntity [
 	^aClass cyclomaticComplexity 
 ]
 
-{ #category : 'commands-property' }
+{ #category : 'tools-property' }
 MMCPServer >> propertyMethodNumberOfStatements: anEntity [
 
 	<jrpc: #property:methodNumberOfStatements>
@@ -450,7 +450,7 @@ MMCPServer >> propertyMethodNumberOfStatements: anEntity [
 	^aClass numberOfStatements 
 ]
 
-{ #category : 'commands-property' }
+{ #category : 'tools-property' }
 MMCPServer >> propertyPackageCohesion: anEntity [
 
 	<jrpc: #property:packageCohesion>
@@ -463,7 +463,7 @@ MMCPServer >> propertyPackageCohesion: anEntity [
 	^package martinCohesion 
 ]
 
-{ #category : 'commands-property' }
+{ #category : 'tools-property' }
 MMCPServer >> propertyPackageCoupling: anEntity [
 
 	<jrpc: #property:packageCoupling>
@@ -476,7 +476,7 @@ MMCPServer >> propertyPackageCoupling: anEntity [
 	^package efferentCoupling 
 ]
 
-{ #category : 'commands-requests' }
+{ #category : 'tools-requests' }
 MMCPServer >> requestEntityName: anEntity [
 
 	<jrpc: #request:entityName>
@@ -487,7 +487,7 @@ MMCPServer >> requestEntityName: anEntity [
 		mooseName
 ]
 
-{ #category : 'commands-requests' }
+{ #category : 'tools-requests' }
 MMCPServer >> requestEntityType: anEntity [
 
 	<jrpc: #request:entityType>
@@ -498,7 +498,7 @@ MMCPServer >> requestEntityType: anEntity [
 		class name
 ]
 
-{ #category : 'commands-requests' }
+{ #category : 'tools-requests' }
 MMCPServer >> requestModelName [
 
 	<jrpc: #request:modelName>
@@ -508,7 +508,7 @@ MMCPServer >> requestModelName [
 	^mooseModel name
 ]
 
-{ #category : 'commands-requests' }
+{ #category : 'tools-requests' }
 MMCPServer >> requestModelRepository [
 
 	<jrpc: #request:modelRepository>
@@ -518,7 +518,7 @@ MMCPServer >> requestModelRepository [
 	^'https://github.com/NicolasAnquetil/VerveineJ'
 ]
 
-{ #category : 'commands-requests' }
+{ #category : 'tools-requests' }
 MMCPServer >> requestModelSize [
 
 	<jrpc: #request:modelSize>
