@@ -24,7 +24,7 @@ BaselineOfMooseMCP >> defineDependencies: spec [
 		with: [ 
 			spec
 				loads: #( Deployment );
-				repository: 'https://github.com/juliendelplanque/JRPC' ]
+				repository: 'github://NicolasAnquetil/JRPC' ]
 ]
 
 { #category : 'packages' }
