@@ -48,6 +48,16 @@ MMCPServer >> asBooleanPropery: prop for: entity [
 	^value isNotNil
 ]
 
+{ #category : 'tools-queries' }
+MMCPServer >> booleanQuery: aResource property: aProperty [
+
+	<jrpc: #query:boolean>
+
+	self log: ('query:boolean: ' , aProperty asString , ' on: ', aResource asString).
+
+	^(FQBooleanQuery property: aProperty) executeOn: (formatter getList: aResource)
+]
+
 { #category : 'accessing' }
 MMCPServer >> byID [
 
