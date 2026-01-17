@@ -27,8 +27,3 @@ The overall interaction is the following:
   - answer is returned to the End User.
 
 <img width="618" height="695" alt="pharo-jrcp-uml of the use of the Moose MCP server" src="resources/mcp-server.svg" />
-
-# JSON-RPC server
-
-For reference, this is the UML sequence diagram of how a JSON-RPC server works in Pharo:
-<img width="1380" height="997" alt="UML sequence diagram for processing a JRCP request in Pharo" src="resources/pharo-jrcp-uml.png" />
