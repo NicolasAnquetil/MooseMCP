@@ -18,8 +18,8 @@ There is an additional `mathServer.py` to add "mathematical capabilities" to the
 It could/should be integrated into `mooseMCPClient.py`.
 
 The overall interaction is the following:
-- EndUser launches the Moose image. Moose must have a Famix model of a project.
-- EndUser starts the MCP server in Moose
+1. EndUser launches the Moose image. Moose must have a Famix model of a project.
+1. EndUser starts the MCP server in Moose
 ```st
 server := MMCPToolServer new mooseModel: <the-moose-model> ; yourself.
 server start.
@@ -31,11 +31,11 @@ server start.
   Each MCP tool is declared as a python function in the `mooseMCPServer.py` file and calls a method of the Moose server (through JSON-RPC);
 1. `mooseMCPClient.py` registers the `mooseMCPServer.py` and the list of its MCP tools in the LLM;
 1. `mooseMCPClient.py` starts an interaction loop with the user:
-  1. EndUser asks a question;
-  1. `mooseMCPClient.py` forwards the question to the LLM;
-  1. LLM decides what MCP tools it needs and calls them in the `mooseMCPServer.py`;
-  1. `mooseMCPServer.py` forwards the calls to the Moose JSON-RPC server;
-  1. answer is returned to the End User.
+  - EndUser asks a question;
+  - `mooseMCPClient.py` forwards the question to the LLM;
+  - LLM decides what MCP tools it needs and calls them in the `mooseMCPServer.py`;
+  - `mooseMCPServer.py` forwards the calls to the Moose JSON-RPC server;
+  - answer is returned to the End User.
 
 <img width="618" height="695" alt="pharo-jrcp-uml of the use of the Moose MCP server" src="resources/mcp-server.svg" />
 
