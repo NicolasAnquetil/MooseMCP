@@ -10,11 +10,11 @@ This is in `pythonClient/mooseMCPServer.py` and and `MMCPServer >> defaultPort`.
 
 # Using it
 
-There two main files:
+There are two main files:
 - `mooseMCPClient.py`: an end user tool that launchs a MCP server and a LLM;
 - `mooseMCPServer.py`: a MCP server that forwards the LLM queries to the Moose server.
 
-There is an additional `mathServer.py` to add "mathematical" capabilities to the LLM (comparing numbers, summing them,...).
+There is an additional `mathServer.py` to add "mathematical capabilities" to the LLM (comparing numbers, summing them,...).
 It could/should be integrated into `mooseMCPClient.py`.
 
 The overall interaction is the following:
@@ -24,18 +24,18 @@ The overall interaction is the following:
 server := MMCPToolServer new mooseModel: <the-moose-model> ; yourself.
 server start.
 ```
-- EndUser starts the `mooseMCPClient.py` (with python).
-- `mooseMCPClient.py` starts the `mooseMCPServer.py` and the LLM;
+1. EndUser starts the `mooseMCPClient.py` (with python).
+1. `mooseMCPClient.py` starts the `mooseMCPServer.py` and the LLM;
   Some API key might be needed to use the LLM;
-- `mooseMCPClient.py` asks for the list of "MCP tools" that the `mooseMCPServer.py` offers.
+1. `mooseMCPClient.py` asks for the list of "MCP tools" that the `mooseMCPServer.py` offers.
   Each MCP tool is declared as a python function in the `mooseMCPServer.py` file and calls a method of the Moose server (through JSON-RPC);
-- `mooseMCPClient.py` registers the `mooseMCPServer.py` and the list of its MCP tools in the LLM;
-- `mooseMCPClient.py` starts an interaction loop with the user:
-  - EndUser asks a question;
-  - `mooseMCPClient.py` forwards the question to the LLM;
-  - LLM decides what MCP tools it needs and calls them in the `mooseMCPServer.py`;
-  - `mooseMCPServer.py` forwards the calls to the Moose JSON-RPC server;
-  - answer is returned to the End User.
+1. `mooseMCPClient.py` registers the `mooseMCPServer.py` and the list of its MCP tools in the LLM;
+1. `mooseMCPClient.py` starts an interaction loop with the user:
+  1. EndUser asks a question;
+  1. `mooseMCPClient.py` forwards the question to the LLM;
+  1. LLM decides what MCP tools it needs and calls them in the `mooseMCPServer.py`;
+  1. `mooseMCPServer.py` forwards the calls to the Moose JSON-RPC server;
+  1. answer is returned to the End User.
 
 <img width="618" height="695" alt="pharo-jrcp-uml of the use of the Moose MCP server" src="resources/mcp-server.svg" />
 
