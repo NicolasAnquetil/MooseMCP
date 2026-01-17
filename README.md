@@ -45,7 +45,7 @@ This is a standard python project adapted from an MCP example on the web.
 
 Python environement configuration:
 ```sh
-$ uv init [optional if .lock already exists]
+$ uv init # optional if .lock already exists
 $ uv venv
 $ uv add -r requirements.txt
 ```
