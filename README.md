@@ -35,7 +35,7 @@ server start.
    - `mooseMCPClient.py` forwards the question to the LLM;
    - LLM decides what MCP tools it needs and calls them in the `mooseMCPServer.py`;
    - `mooseMCPServer.py` forwards the calls to the Moose JSON-RPC server;
-   - answer is returned to the End User.
+   - answer is returned to the EndUser.
 
 <img width="618" height="695" alt="pharo-jrcp-uml of the use of the Moose MCP server" src="resources/mcp-server.svg" />
 
@@ -45,7 +45,7 @@ This is a standard python project adapted from an MCP example on the web.
 
 Python environement configuration:
 ```sh
-$ uv init [optionel si .lock est deja la]
+$ uv init [optional if .lock already exists]
 $ uv venv
 $ uv add -r requirements.txt
 ```
