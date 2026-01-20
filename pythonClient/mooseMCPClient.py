@@ -1,6 +1,6 @@
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
-from langchain_groq import ChatGroq
+from langchain_ollama import ChatOllama
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -49,15 +49,12 @@ async def main():
     server_configs = {
         "MathServer": { "command": ".venv/bin/python", "args": ["./mathServer.py"], "transport": "stdio" },
         "MooseMCPServer": { "command": ".venv/bin/python", "args": ["./mooseMCPServer.py"], "transport": "stdio" },
-#        "MyWeatherServer": { "transport": "streamable_http", "url": "http://localhost:4444" }
     }
     client=MultiServerMCPClient(server_configs)
 
-    import os
-    os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
-
     tools=await client.get_tools()
-    model=ChatGroq(model="qwen/qwen3-32b")
+    model = ChatOllama( model="mistral", temperature=0.1)
+)
 
     agent = create_react_agent(model,tools)
 
@@ -66,3 +63,4 @@ async def main():
 # ----------------------------------------------------------------------------
 if __name__ == "__main__":
     asyncio.run(main())
+2

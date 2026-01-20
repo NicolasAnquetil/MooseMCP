@@ -1,9 +1,10 @@
 from mcp.server.fastmcp import FastMCP
-from mcp.server.fastmcp.utilities.logging import get_logger
+import logging
 
 mcp = FastMCP(name="MooseMCPServer")
 
-logger = get_logger(__name__)
+logging.basicConfig(filename='mooseMCP.log', level=logging.INFO)
+logger = logging.get_logger(__name__)
 
 #----------------------------------------------------------------------------
 @mcp.tool()

@@ -1,14 +1,14 @@
 from mcp.server.fastmcp import FastMCP
 import requests
 import json
-from mcp.server.fastmcp.utilities.logging import get_logger
- 
+import logging
+
 
 mcp = FastMCP(name="MooseMCPServer")
 
-logger = get_logger(__name__)
-#file_handler = logging.FileHandler('mooseMCPServerPy.log')
-#logger.addHandler(file_handler)
+logging.basicConfig(filename="mooseMCP.log", level=logging.INFO)
+logger = logging.getLogger("MooseMCPServer")
+
 
 
 #----------------------------------------------------------------------------
@@ -19,9 +19,10 @@ logger = get_logger(__name__)
 #----------------------------------------------------------------------------
 @mcp.tool()
 def listEntitiesForType(entityType : str) -> list[str]:
-    """Lists all the entities of a given type in a project
-    Args:
-        The name of an entity type as a string
+    """Lists all the entities of a given type in a project.
+
+    Args: 
+        The type as a string, for example, "Package", "Class", "Interface", or "Method".
     Returns:
         A list of strings naming all the entities of the given type in a moose project."""
 
@@ -32,7 +33,7 @@ def listEntitiesForType(entityType : str) -> list[str]:
 def listEntityChildren(entity : str) -> list[str]:
     """Lists all the children of an entity
     Args:
-        A string naming an entity
+        A string naming an entity, for example "fr.inria.moose.
     Returns:
         A list of strings naming all the children of the given entity."""
 
@@ -285,7 +286,7 @@ def resourcePackageDSM() -> bytes:
 #----------------------------------------------------------------------------
 def callMooseServer(command: str, args: list):
 
-    #logger.info(f"callMooseServer: '{command}' with '{args}'")
+    logger.debug("call MooseServer:%s(%s)/", command, args)
 
     payload = {
         "method": command,
@@ -297,7 +298,7 @@ def callMooseServer(command: str, args: list):
     response = requests.post(
         url, data=json.dumps(payload), headers=headers).json()
 
-    #logger.info(f"  response to {command} -> {response}")
+    logger.debug("MooseServer answer:%s/", response)
 
     return response["result"]
 

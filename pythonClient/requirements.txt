@@ -1,7 +1,2 @@
-langchain-groq
-langchain-mistralai
-langchain-mcp-adapters
-langgraph
 mcp
-dotenv
-requests
+openai
