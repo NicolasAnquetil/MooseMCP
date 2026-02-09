@@ -1,7 +1,9 @@
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
-from langchain_ollama import ChatOllama
+from langchain_groq import ChatGroq
 
+import os
+    
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -30,7 +32,9 @@ async def interaction_loop():
         print("=========================================================================")
         question = input("Question: ")
         if (question == "quit"): break
-        moose_answer = await agent.ainvoke( {"messages" : [{"role": "user", "content": question}]} )
+        moose_answer = await agent.ainvoke( {"messages" : [
+            {"role": "user", "content": question}
+        ]} )
         llm_answer = moose_answer["messages"][-1].content
         print(f"Answer: {llm_answer}")
 
@@ -46,15 +50,17 @@ async def main():
 
     global agent
 
-    server_configs = {
-        "MathServer": { "command": ".venv/bin/python", "args": ["./mathServer.py"], "transport": "stdio" },
-        "MooseMCPServer": { "command": ".venv/bin/python", "args": ["./mooseMCPServer.py"], "transport": "stdio" },
-    }
-    client=MultiServerMCPClient(server_configs)
+    os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
 
     tools=await client.get_tools()
-    model = ChatOllama( model="mistral", temperature=0.1)
-)
+    model = ChatGroq(
+        model="qwen/qwen3-32b",
+#        temperature=0,
+#        max_tokens=None,
+#        reasoning_format="parsed",
+#        timeout=None,
+#        max_retries=2
+    )
 
     agent = create_react_agent(model,tools)
 
