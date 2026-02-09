@@ -5,185 +5,68 @@ I wait for commands on a TCP socket and answer them
 To use just do:
 - load a model in Moose
 ```
-server := MMCPServer new.
-server start.
+server := MMCPxxxServer new.
+server
+	mooseModel: <some-moose-model> ;
+	start.
 ```
 
 "
 Class {
-	#name : 'MMCPServer',
-	#superclass : 'JRPCHTTPServer',
-	#instVars : [
-		'mooseModel',
-		'formatter',
-		'memory'
-	],
+	#name : 'MMCPToolServer',
+	#superclass : 'MMCPAbstractServer',
 	#category : 'MooseMCP',
 	#package : 'MooseMCP'
 }
 
 { #category : 'defaults' }
-MMCPServer class >> defaultPort [
+MMCPToolServer class >> defaultPort [
 
 	^ 4444
 ]
 
-{ #category : 'utilities' }
-MMCPServer >> asBooleanPropery: prop for: entity [
-	"Make a boolean from any property
-	 - for booleans, return their value
-	 - for collection, return false if they are empty, true if not
-	 - for relations to FamixObject (hasOpposite), return false if it's nil, true otherwise
-	 - otherwise (Numbers, Strings) return false if it's not nil"
-
-	| value |
-	value := entity perform: prop name.
-
-	prop type class = FM3Boolean ifTrue: [ ^value ].
-
-	prop isMultivalued ifTrue: [ ^value isNotEmpty ].
-
-	prop hasOpposite ifTrue: [ ^value isNotNil ].
-
-	^value isNotNil
-]
-
 { #category : 'tools-queries' }
-MMCPServer >> booleanQuery: aResource property: aProperty [
+MMCPToolServer >> booleanQuery: aResourceName property: aProperty [
 
 	<jrpc: #query:boolean>
 
-	self log: ('query:boolean: ' , aProperty asString , ' on: ', aResource asString).
+	self log: ('query:boolean: ' , aProperty asString , ' on: ', aResourceName asString).
 
-	^(FQBooleanQuery property: aProperty) executeOn: (formatter getList: aResource)
-]
-
-{ #category : 'accessing' }
-MMCPServer >> byID [
-
-	formatter := MMCPServerById new
-		mooseModel: mooseModel ;
-		yourself
-]
-
-{ #category : 'accessing' }
-MMCPServer >> byName [
-
-	formatter := MMCPServerByName new
-		mooseModel: mooseModel ;
-		yourself
+	^(FQBooleanQuery property: aProperty) executeOn: (interfacer getList: aResourceName)
 ]
 
 { #category : 'tools-server' }
-MMCPServer >> commandMooseMCPServerVersion [
+MMCPToolServer >> commandMooseMCPServerVersion [
 
 	<jrpc: #'command:version'>
 
 	^ '0.1.0'
 ]
 
-{ #category : 'tools-server' }
-MMCPServer >> commandPharoQuit [
-
-	<jrpc: #command:pharoQuit>
-
-	SmalltalkImage current snapshot: true andQuit: true
-]
-
-{ #category : 'tools-server' }
-MMCPServer >> commandServerStop [
-
-	<jrpc: #command:serverStop>
-
-	self log: 'command:serverStop'.
-
-	self stop.
-	^nil
-]
-
-{ #category : 'accessing' }
-MMCPServer >> defaultMooseModel [
-
-	^MooseModel root allModels anyOne
-]
-
-{ #category : 'utilities' }
-MMCPServer >> handlers [
-
-	^self messageProcessor handlers collect: #methodName
-]
-
-{ #category : 'initialization' }
-MMCPServer >> initialize [ 
-
-	super initialize.
-
-	self port: self defaultPort.
-	self addHandlersFromPragmasIn: self.
-
-	self mooseModel: self defaultMooseModel.
-	memory := Dictionary new.
-
-	self resetLog.
-	self byName
-]
-
-{ #category : 'tools-server' }
-MMCPServer >> initializeProtocol: protocolVersion capabilities: capabilities client: clientInfo [
-
-	"MCP initialization message:
-
-	{
-		""method"":""initialize"",
-			""params"":{
-				""protocolVersion"":""2025-06-18"",
-				""capabilities"":{""elicitation"": {}},
-				""clientInfo"":{
-					""name"":""mcp"",
-					""version"":""0.1.0""
-				}
-			},
-		""jsonrpc"":""2.0"",
-		""id"":0
-	}"
-
-	<jrpc: #initialize>
-
-	self log: (
-		'initialize connection:' , protocolVersion asString ,
-		' capabilities:' , capabilities asString ,
-		' clientInfo:' , clientInfo asString).
-
-	^ ''
-
-
-
-]
-
 { #category : 'tools-list' }
-MMCPServer >> listAccessedEntities: aSourceMethod [
+MMCPToolServer >> listAccessedEntities: aSourceMethod [
 
 	<jrpc: #list:accessedEntites>
 
 	self log: ('list:accessedEntites for ', aSourceMethod).
 
-	^(formatter getEntity: aSourceMethod)
+	^(interfacer getEntity: aSourceMethod)
 		accesses collect: #variable
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listAccessingMethods: aTargetEntity [
+MMCPToolServer >> listAccessingMethods: aTargetEntity [
 
 	<jrpc: #list:accessingMethods>
 
 	self log: ('list:accessingMethods for ', aTargetEntity).
 
-	^(formatter getEntity: aTargetEntity)
+	^(interfacer getEntity: aTargetEntity)
 		incomingAccesses collect: #accessor
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listEntitiesForType: aName [
+MMCPToolServer >> listEntitiesForType: aName [
 
 	<jrpc: #list:entitiesForType>
 
@@ -200,65 +83,65 @@ MMCPServer >> listEntitiesForType: aName [
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listEntityChildren: anEntity [
+MMCPToolServer >> listEntityChildren: anEntity [
 
 	<jrpc: #list:entityChildren>
 
 	self log: ('list:entityChildren for ', anEntity asString).
 
-	^(formatter getEntity: anEntity)
+	^(interfacer getEntity: anEntity)
 		children
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listEntityClients: anEntity [
+MMCPToolServer >> listEntityClients: anEntity [
 
 	<jrpc: #list:entityClients>
 
 	self log: ('list:entityClients for ', anEntity).
 
-	^(formatter getEntity: anEntity)
+	^(interfacer getEntity: anEntity)
 		allClients
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listEntityParents: anEntity [
+MMCPToolServer >> listEntityParents: anEntity [
 
 	<jrpc: #list:entityParents>
 
 	self log: ('list:entityParents for ', anEntity asString).
 
-	^(formatter getEntity: anEntity)
+	^(interfacer getEntity: anEntity)
 		parents
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listEntityProperties: anEntity [
+MMCPToolServer >> listEntityProperties: anEntity [
 
 	<jrpc: #list:entityProperties>
 
 	| entity |
 	self log: 'list:entityProperties : ' , anEntity asString.
 
-	entity := (formatter getEntity: anEntity).
+	entity := (interfacer getEntity: anEntity).
 
 	^entity allProperties collect: [ :prop | prop name , ' : ' , (prop comment ifNil: ['']) ]
 
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listEntityProviders: anEntity [
+MMCPToolServer >> listEntityProviders: anEntity [
 
 	<jrpc: #list:entityProviders>
 
 	self log: ('list:entityProviders for ', anEntity asString).
 
-	^(formatter getEntity: anEntity)
+	^(interfacer getEntity: anEntity)
 		allProviders
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listEntityTypes [
+MMCPToolServer >> listEntityTypes [
 
 	<jrpc: #list:entityTypes>
 
@@ -270,51 +153,51 @@ MMCPServer >> listEntityTypes [
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listImplementedInterface: aClass [
+MMCPToolServer >> listImplementedInterface: aClass [
 
 	<jrpc: #list:implementedInterfaces>
 
 	self log: ('list:implementedInterfaces for ', aClass).
 
-	^(formatter getEntity: aClass)
+	^(interfacer getEntity: aClass)
 		interfaceImplementations collect: #interface 
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listImplementingClasses: anInterface [
+MMCPToolServer >> listImplementingClasses: anInterface [
 
 	<jrpc: #list:implementingClasses>
 
 	self log: ('list:implementingClasses for ', anInterface).
 
-	^(formatter getEntity: anInterface)
+	^(interfacer getEntity: anInterface)
 		implementations collect: #implementingClass 
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listInvokedMethods: aSourceMethod [
+MMCPToolServer >> listInvokedMethods: aSourceMethod [
 
 	<jrpc: #list:invokedMethods>
 
 	self log: ('list:invokedMethods for ', aSourceMethod).
 
-	^(formatter getEntity: aSourceMethod)
+	^(interfacer getEntity: aSourceMethod)
 		invokedMethods 
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listInvokingMethods: aTargetMethod [
+MMCPToolServer >> listInvokingMethods: aTargetMethod [
 
 	<jrpc: #list:invokingMethods>
 
 	self log: ('list:invokingMethods for ', aTargetMethod).
 
-	^(formatter getEntity: aTargetMethod)
+	^(interfacer getEntity: aTargetMethod)
 		invokingMethods 
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listPropertiesForType: aName [
+MMCPToolServer >> listPropertiesForType: aName [
 
 	<jrpc: #list:propertiesForType>
 
@@ -330,102 +213,49 @@ MMCPServer >> listPropertiesForType: aName [
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listSubClasses: aSuperClass [
+MMCPToolServer >> listSubClasses: aSuperClass [
 
 	<jrpc: #list:subClasses>
 
 	self log: ('list:subClasses for ', aSuperClass).
 
-	^(formatter getEntity: aSuperClass)
+	^(interfacer getEntity: aSuperClass)
 		subInheritances collect: #subclass 
 ]
 
 { #category : 'tools-list' }
-MMCPServer >> listSuperClasses: aSuperClass [
+MMCPToolServer >> listSuperClasses: aSuperClass [
 
 	<jrpc: #list:superClasses>
 
 	self log: ('list:superClasses for ', aSuperClass).
 
-	^(formatter getEntity: aSuperClass)
+	^(interfacer getEntity: aSuperClass)
 		superInheritances collect: #superclass 
 ]
 
-{ #category : 'utilities' }
-MMCPServer >> log: aString [
-
-	aString record
-]
-
-{ #category : 'tools-memory' }
-MMCPServer >> memoryGet: aName [
-
-	<jrpc: #memory:get>
-
-	self log: ('memory:get for ', aName asString).
-
-	^memory at: aName ifAbsent: [ Error signal: 'No list named ', aName ,' found' ]
-]
-
-{ #category : 'tools-memory' }
-MMCPServer >> memorySet: aName entities: aCollection [
-
-	<jrpc: #memory:set>
-
-	self log: ('memory:set ', aName asString, ' value: ' , aCollection asString).
-
-	memory at: aName put: aCollection.
-	^aCollection size
-]
-
-{ #category : 'accessing' }
-MMCPServer >> mooseModel [
-
-	^mooseModel
-]
-
-{ #category : 'accessing' }
-MMCPServer >> mooseModel: anObject [
-
-	mooseModel := anObject
-]
-
-{ #category : 'message performing' }
-MMCPServer >> perform: selector withArguments: argArray [
-
-	^formatter resultFormat: (super perform: selector withArguments: argArray)
-]
-
-{ #category : 'utilities' }
-MMCPServer >> property: prop matchesName: aPropertyName [
-
-	(prop name sameAs: aPropertyName) ifTrue: [ ^true ].
-
-	^(prop name sameAs: ('is' , aPropertyName))
-]
-
 { #category : 'tools-property' }
-MMCPServer >> propertyClassLackOfCohesion: anEntity [
+MMCPToolServer >> propertyClassLackOfCohesion: anEntity [
 
 	<jrpc: #property:classLackOfCohesion>
 
 	| aClass |
 	self log: 'property:classLackOfCohesion for : ' , anEntity asString.
 
-	aClass := (formatter getEntity: anEntity).
+	aClass := (interfacer getEntity: anEntity).
 	aClass isClass ifFalse: [ Error signal: 'Entity is not a class'  ].
 	^aClass lcom3 
 ]
 
 { #category : 'tools-property' }
-MMCPServer >> propertyHas: anEntity property: aPropertyName [
+MMCPToolServer >> propertyHas: anEntity property: aPropertyName [
 
 	<jrpc: #property:hasProperty>
 
 	| entity |
 	self log: 'property:has : ' , anEntity asString , ' property: ' , aPropertyName.
 
-	entity := (formatter getEntity: anEntity).
+	entity := (interfacer getEntity: anEntity).
 
 	^entity allDeclaredProperties
 		detect: [ :prop | self property: prop matchesName: aPropertyName ]
@@ -435,81 +265,81 @@ MMCPServer >> propertyHas: anEntity property: aPropertyName [
 ]
 
 { #category : 'tools-property' }
-MMCPServer >> propertyMethodCyclomaticComplexity: anEntity [
+MMCPToolServer >> propertyMethodCyclomaticComplexity: anEntity [
 
 	<jrpc: #property:methodCyclomaticComplexity>
 
 	| aClass |
 	self log: 'property:methodCyclomaticComplexity for : ' , anEntity asString.
 
-	aClass := (formatter getEntity: anEntity).
+	aClass := (interfacer getEntity: anEntity).
 	aClass isMethod ifFalse: [ Error signal: 'Entity is not a method'  ].
 	^aClass cyclomaticComplexity 
 ]
 
 { #category : 'tools-property' }
-MMCPServer >> propertyMethodNumberOfStatements: anEntity [
+MMCPToolServer >> propertyMethodNumberOfStatements: anEntity [
 
 	<jrpc: #property:methodNumberOfStatements>
 
 	| aClass |
 	self log: 'property:methodNumberOfStatements for : ' , anEntity asString.
 
-	aClass := (formatter getEntity: anEntity).
+	aClass := (interfacer getEntity: anEntity).
 	aClass isMethod ifFalse: [ Error signal: 'Entity is not a method'  ].
 	^aClass numberOfStatements 
 ]
 
 { #category : 'tools-property' }
-MMCPServer >> propertyPackageCohesion: anEntity [
+MMCPToolServer >> propertyPackageCohesion: anEntity [
 
 	<jrpc: #property:packageCohesion>
 
 	| package |
 	self log: 'property:packageCohesion for : ' , anEntity asString.
 
-	package := (formatter getEntity: anEntity).
+	package := (interfacer getEntity: anEntity).
 	package isPackage ifFalse: [ Error signal: 'Entity is not a package' ].
 	^package martinCohesion 
 ]
 
 { #category : 'tools-property' }
-MMCPServer >> propertyPackageCoupling: anEntity [
+MMCPToolServer >> propertyPackageCoupling: anEntity [
 
 	<jrpc: #property:packageCoupling>
 
 	| package |
 	self log: 'property:packageCoupling for : ' , anEntity asString.
 
-	package := (formatter getEntity: anEntity).
+	package := (interfacer getEntity: anEntity).
 	package isPackage ifFalse: [ Error signal: 'Entity is not a package' ].
 	^package efferentCoupling 
 ]
 
 { #category : 'tools-requests' }
-MMCPServer >> requestEntityName: anEntity [
+MMCPToolServer >> requestEntityName: anEntity [
 
 	<jrpc: #request:entityName>
 
 	self log: 'request:entityName for : ' , anEntity asString.
 
-	^(formatter getEntity: anEntity ifAbsent: [^#()])
+	^(interfacer getEntity: anEntity ifAbsent: [^#()])
 		mooseName
 ]
 
 { #category : 'tools-requests' }
-MMCPServer >> requestEntityType: anEntity [
+MMCPToolServer >> requestEntityType: anEntity [
 
 	<jrpc: #request:entityType>
 
 	self log: 'request:entityType for : ' , anEntity asString.
 
-	^(formatter getEntity: anEntity ifAbsent: [^#()])
+	^(interfacer getEntity: anEntity ifAbsent: [^#()])
 		class name
 ]
 
 { #category : 'tools-requests' }
-MMCPServer >> requestModelName [
+MMCPToolServer >> requestModelName [
 
 	<jrpc: #request:modelName>
 
@@ -519,7 +349,7 @@ MMCPServer >> requestModelName [
 ]
 
 { #category : 'tools-requests' }
-MMCPServer >> requestModelRepository [
+MMCPToolServer >> requestModelRepository [
 
 	<jrpc: #request:modelRepository>
 
@@ -529,7 +359,7 @@ MMCPServer >> requestModelRepository [
 ]
 
 { #category : 'tools-requests' }
-MMCPServer >> requestModelSize [
+MMCPToolServer >> requestModelSize [
 
 	<jrpc: #request:modelSize>
 
@@ -538,18 +368,8 @@ MMCPServer >> requestModelSize [
 	^mooseModel size
 ]
 
-{ #category : 'utilities' }
-MMCPServer >> resetLog [
-
-	TinyLogger default ensureFileLoggerNamed: 'mooseMCPServer.log'.
-	TinyLogger default clearLog.
-
-	('working on mooseModel: ' , self mooseModel name) record.
-	(self messageProcessor handlersCount asString , ' handlers registered') record.
-]
-
 { #category : 'resources' }
-MMCPServer >> resourceModelReport: jsonSettings [
+MMCPToolServer >> resourceModelReport: jsonSettings [
 
 	<jrpc: #'resource:model-report'>
 
@@ -565,7 +385,7 @@ MMCPServer >> resourceModelReport: jsonSettings [
 ]
 
 { #category : 'resources' }
-MMCPServer >> resourcePackageDSM [
+MMCPToolServer >> resourcePackageDSM [
 
 	<jrpc: #'resource:package-dsm'>
 
