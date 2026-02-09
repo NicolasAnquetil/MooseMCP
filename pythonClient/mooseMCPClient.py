@@ -1,5 +1,4 @@
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langgraph.prebuilt import create_react_agent
 from langchain_groq import ChatGroq
 
 import os
@@ -9,19 +8,8 @@ load_dotenv()
 
 import asyncio
 
-global agent
-
 # ----------------------------------------------------------------------------
-async def mcp_question(quest : str) -> str:
-    """Send a question to the LLM server and return the answer"""
-
-#    print(f"Question: {quest}")
-    moose_answer = await agent.ainvoke( {"messages" : [{"role": "user", "content": quest}]} )
-
-    return moose_answer["messages"][-1].content
-
-# ----------------------------------------------------------------------------
-async def interaction_loop():
+async def interaction_loop(llm):
     """Interaction loop with user
      - Get question from user
      - Send it to the LLM server
@@ -32,20 +20,22 @@ async def interaction_loop():
         print("=========================================================================")
         question = input("Question: ")
         if (question == "quit"): break
-        moose_answer = await agent.ainvoke( {"messages" : [
-            {"role": "system", "content": "You are an expert software reverse engineer.
-Your role is to assist an inexperienced software developer in analyzing the source code of a software project.
+        moose_answer = llm.invoke( [
+            ("system", """You are an expert software reverse engineer.
+Your role is to pilot a llm server in analyzing the source code of a software project.
 You must follow all output and behavior constraints exactly.
 You must not provide explanations, justifications, or natural-language guidance unless explicitly instructed otherwise.
-"},
-            {"role": "developer", "content": "Your task is to translate the user’s questions into appropriate tool calls for the Moose software analysis platform.
+"""),
+            ("developer", """Your task is to translate the user’s questions into appropriate tool calls for the Moose software analysis platform.
+
 Behavior rules:
     Interpret each user question as a request for one or more Moose analyses.
     Select the relevant Moose tools that answer the question.
     You can use only the tools listed below.
-    If no tool applies, output \"NO_TOOL\".
+    If no tool applies, output "NO_TOOL".
     Do not restate or paraphrase the user’s question.
     Do not explain your reasoning.
+
 Output rules:
     Output only the Moose tool names and their required parameters.
     Use a minimal, machine-readable format suitable for automatic processing.
@@ -154,11 +144,12 @@ The list of Moose tools is the following:
 20. name: \"memory:get\"
   description: Recovers a list of entities from its associated key
   parameter: The key associated to the list
-  result: A list of entities"},
-            {"role": "user", "content": question}
-        ]} )
-        llm_answer = moose_answer["messages"][-1].content
-        print(f"Answer: {llm_answer}")
+  result: A list of entities
+
+"""),
+            ("user", question)
+        ] )
+        print(f"Answer: {moose_answer.content}")
 
     return
 
@@ -170,12 +161,9 @@ async def main():
      - Start interaction loop with user
     """
 
-    global agent
-
     os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
 
-    tools=await client.get_tools()
-    model = ChatGroq(
+    llm = ChatGroq(
         model="qwen/qwen3-32b",
 #        temperature=0,
 #        max_tokens=None,
@@ -184,9 +172,7 @@ async def main():
 #        max_retries=2
     )
 
-    agent = create_react_agent(model,tools)
-
-    await interaction_loop()
+    await interaction_loop(llm)
 
 # ----------------------------------------------------------------------------
 if __name__ == "__main__":
