@@ -1,25 +1,25 @@
 Class {
-	#name : 'MMCPServerById',
-	#superclass : 'MMCPServerFormatter',
+	#name : 'MMCPServerIdInterface',
+	#superclass : 'MMCPServerInterface',
 	#category : 'MooseMCP',
 	#package : 'MooseMCP'
 }
 
 { #category : 'utilities' }
-MMCPServerById >> getEntity: aName [
+MMCPServerIdInterface >> getEntity: aName [
 
 	^mooseModel entityNamed: aName ifAbsent: [ Error signal: 'Could not find entity' ]
 ]
 
 { #category : 'utilities' }
-MMCPServerById >> getEntity: anID ifAbsent: aBlock [
+MMCPServerIdInterface >> getEntity: anID ifAbsent: aBlock [
 
 	^mooseModel entityStorage
 		detect: [ :entity | entity mooseID = anID] ifNone: [ aBlock value ]
 ]
 
 { #category : 'utilities' }
-MMCPServerById >> returnMooseEntity: anEntitity [
+MMCPServerIdInterface >> returnMooseEntity: anEntitity [
 
 	^anEntitity mooseID
 ]
