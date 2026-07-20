@@ -5,6 +5,12 @@ Class {
 	#package : 'MooseMCP'
 }
 
+{ #category : 'metadata' }
+MMCPToolGetMetrics class >> commandClass [
+
+	^ MMCPGetMetricsCommand
+]
+
 { #category : 'defaults' }
 MMCPToolGetMetrics class >> toolName [
 
@@ -34,12 +40,6 @@ MMCPToolGetMetrics >> buildInputSchema [
 					   values: #( 'none' 'package' 'class' )
 					   default: 'none') }
 		  required: #( 'modelId' )
-]
-
-{ #category : 'private - execution' }
-MMCPToolGetMetrics >> commandForRequest: aRequest [
-
-	^ MMCPGetMetricsCommand tool: self request: aRequest
 ]
 
 { #category : 'metadata' }

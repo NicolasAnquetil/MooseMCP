@@ -5,6 +5,12 @@ Class {
 	#package : 'MooseMCP'
 }
 
+{ #category : 'metadata' }
+MMCPToolGetEntity class >> commandClass [
+
+	^ MMCPGetEntityCommand
+]
+
 { #category : 'defaults' }
 MMCPToolGetEntity class >> toolName [
 
@@ -38,12 +44,6 @@ MMCPToolGetEntity >> buildInputSchema [
 					   description: 'Maximum number of entities to return.'
 					   default: 20) }
 		  required: #( 'modelId' )
-]
-
-{ #category : 'private - execution' }
-MMCPToolGetEntity >> commandForRequest: aRequest [
-
-	^ MMCPGetEntityCommand tool: self request: aRequest
 ]
 
 { #category : 'metadata' }

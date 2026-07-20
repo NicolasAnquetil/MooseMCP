@@ -12,6 +12,12 @@ Class {
 }
 
 { #category : 'metadata' }
+MMCPTool class >> commandClass [
+
+	self subclassResponsibility
+]
+
+{ #category : 'metadata' }
 MMCPTool class >> groupName [
 
 	^ 'moose'
@@ -33,6 +39,12 @@ MMCPTool class >> isBuiltIn [
 MMCPTool class >> toolMutability [
 
 	^ #read
+]
+
+{ #category : 'private - execution' }
+MMCPTool >> commandForRequest: aRequest [
+
+	^ self class commandClass tool: self request: aRequest
 ]
 
 { #category : 'defaults' }

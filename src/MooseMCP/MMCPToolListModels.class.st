@@ -5,6 +5,12 @@ Class {
 	#package : 'MooseMCP'
 }
 
+{ #category : 'metadata' }
+MMCPToolListModels class >> commandClass [
+
+	^ MMCPListModelsCommand
+]
+
 { #category : 'defaults' }
 MMCPToolListModels class >> toolName [
 
@@ -21,12 +27,6 @@ MMCPToolListModels >> buildInputSchema [
 				   'Include entity counts (packages/classes/methods) per model.'
 				   default: true) }
 		  required: #(  )
-]
-
-{ #category : 'private - execution' }
-MMCPToolListModels >> commandForRequest: aRequest [
-
-	^ MMCPListModelsCommand tool: self request: aRequest
 ]
 
 { #category : 'metadata' }

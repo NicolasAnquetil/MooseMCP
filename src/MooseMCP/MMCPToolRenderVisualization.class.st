@@ -5,6 +5,12 @@ Class {
 	#package : 'MooseMCP'
 }
 
+{ #category : 'metadata' }
+MMCPToolRenderVisualization class >> commandClass [
+
+	^ MMCPRenderVisualizationCommand
+]
+
 { #category : 'defaults' }
 MMCPToolRenderVisualization class >> toolName [
 
@@ -36,12 +42,6 @@ MMCPToolRenderVisualization >> buildInputSchema [
 					   description: 'Guardrail against unreadable/huge diagrams.'
 					   default: 75) }
 		  required: #( 'modelId' 'visualization' )
-]
-
-{ #category : 'private - execution' }
-MMCPToolRenderVisualization >> commandForRequest: aRequest [
-
-	^ MMCPRenderVisualizationCommand tool: self request: aRequest
 ]
 
 { #category : 'metadata' }

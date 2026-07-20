@@ -5,6 +5,12 @@ Class {
 	#package : 'MooseMCP'
 }
 
+{ #category : 'metadata' }
+MMCPToolGetRelationships class >> commandClass [
+
+	^ MMCPGetRelationshipsCommand
+]
+
 { #category : 'defaults' }
 MMCPToolGetRelationships class >> toolName [
 
@@ -40,12 +46,6 @@ MMCPToolGetRelationships >> buildInputSchema [
 					   description: 'Maximum number of edges to return.'
 					   default: 50) }
 		  required: #( 'modelId' 'entityId' )
-]
-
-{ #category : 'private - execution' }
-MMCPToolGetRelationships >> commandForRequest: aRequest [
-
-	^ MMCPGetRelationshipsCommand tool: self request: aRequest
 ]
 
 { #category : 'metadata' }
