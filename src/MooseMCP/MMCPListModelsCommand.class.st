@@ -3,7 +3,7 @@ Command that lists loaded Moose models for list_models by delegating to MMCPTool
 "
 Class {
 	#name : 'MMCPListModelsCommand',
-	#superclass : 'MCPToolRequestCommand',
+	#superclass : 'MMCPCommand',
 	#category : 'MooseMCP-Commands',
 	#package : 'MooseMCP',
 	#tag : 'Commands'
@@ -16,5 +16,6 @@ MMCPListModelsCommand >> execute [
 	includeStats := self request
 		                booleanArgumentNamed: 'includeStats'
 		                default: true.
-	^ MMCPToolServer default listModels: includeStats
+	^ (MooseModel root allModels collect: [ :m |
+		   self describeModel: m includeStats: includeStats ]) asArray
 ]

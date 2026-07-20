@@ -3,7 +3,7 @@ Command that computes metrics for get_metrics by delegating to MMCPToolServer.
 "
 Class {
 	#name : 'MMCPGetMetricsCommand',
-	#superclass : 'MCPToolRequestCommand',
+	#superclass : 'MMCPCommand',
 	#category : 'MooseMCP-Commands',
 	#package : 'MooseMCP',
 	#tag : 'Commands'
@@ -12,7 +12,7 @@ Class {
 { #category : 'executing' }
 MMCPGetMetricsCommand >> execute [
 
-	| modelId entityId metrics groupBy |
+	| modelId entityId metrics groupBy model names targets |
 	modelId := self request stringArgumentNamed: 'modelId'.
 	entityId := self request stringArgumentNamed: 'entityId'.
 	metrics := self request
@@ -21,9 +21,25 @@ MMCPGetMetricsCommand >> execute [
 	groupBy := self request
 		           stringArgumentNamed: 'groupBy'
 		           default: 'none'.
-	^ MMCPToolServer default
-		  getMetrics: modelId
-		  entityId: entityId
-		  metrics: metrics
-		  groupBy: groupBy
+	model := self modelNamed: modelId.
+	names := (metrics isNil or: [ metrics isEmpty ])
+		         ifTrue: [
+		         self metricSelectors keys asSortedCollection
+			         asOrderedCollection ]
+		         ifFalse: [ metrics ].
+	targets := (entityId isNil or: [ entityId isEmpty ])
+		           ifTrue: [ self groupTargetsFor: model groupBy: groupBy ]
+		           ifFalse: [
+		           OrderedCollection with:
+			           (self entityWithId: entityId in: model) ].
+	^ (targets collect: [ :entity |
+			   | row metricsDict eId |
+			   metricsDict := Dictionary new.
+			   names do: [ :m |
+				   metricsDict at: m put: (self computeMetric: m for: entity) ].
+			   row := Dictionary new.
+			   eId := self safePerform: #mooseID on: entity.
+			   row at: 'entityId' put: (eId ifNotNil: [ eId asString ]).
+			   row at: 'metrics' put: metricsDict.
+			   row ]) asArray
 ]

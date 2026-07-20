@@ -76,18 +76,23 @@ MMCPToolRenderVisualizationTest >> testSchemaRejectsUnsupportedVisualizationKind
 
 { #category : 'tests' }
 MMCPToolRenderVisualizationTest >> testServerRejectsPngFormatDirectly [
-	"Calling MMCPToolServer directly (bypassing schema validation) exercises the tool's
-	own explicit png/svg guard rather than the schema-level enum rejection above."
+	"Building the command directly with an unvalidated request (bypassing schema validation)
+	exercises the command's own explicit png/svg guard rather than the schema-level enum
+	rejection above."
 
-	self
-		should: [
-				MMCPToolServer default
-					renderVisualization: self modelName
-					visualization: 'dependency_graph'
-					scope: nil
-					format: 'png'
-					maxNodes: 10 ]
-		raise: Error
+	| tool request command |
+	tool := self toolClass new.
+	request := MCPToolRequest new
+		           tool: tool;
+		           arguments: (Dictionary new
+				            at: 'modelId' put: self modelName;
+				            at: 'visualization' put: 'dependency_graph';
+				            at: 'format' put: 'png';
+				            at: 'maxNodes' put: 10;
+				            yourself);
+		           yourself.
+	command := MMCPRenderVisualizationCommand tool: tool request: request.
+	self should: [ command execute ] raise: Error
 ]
 
 { #category : 'private - calling' }

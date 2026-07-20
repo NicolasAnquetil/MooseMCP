@@ -97,7 +97,7 @@ MMCPToolTestCase >> callToolWith: someArguments [
 MMCPToolTestCase >> modelName [
 	"Unique per test instance, not just per class: test_run appears to execute test
 	methods of the same class with overlapping setUp/tearDown lifetimes, and
-	MMCPToolServer looks models up by name via MooseModel root allModels, so a name
+	MMCPCommand looks models up by name via MooseModel root allModels, so a name
 	shared across instances risks one test's calls resolving to a different test's
 	same-named model."
 
