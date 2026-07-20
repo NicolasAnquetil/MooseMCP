@@ -1,399 +1,418 @@
 "
-I am an MCP server that provides some services on a MooseModel
-I wait for commands on a TCP socket and answer them
+I am an MCP tool server for Moose. I expose direct-lookup tools (list_models, get_entity, get_relationships, get_metrics, render_visualization) as JSON-RPC methods (JRPC) over HTTP, so an LLM client can inspect a Famix/Moose model.
 
-To use just do:
-- load a model in Moose
-```
-server := MMCPxxxServer new.
-server
-	mooseModel: <some-moose-model> ;
-	start.
-```
-
+To use:
+server := MMCPToolServer new.
+server start.
 "
 Class {
 	#name : 'MMCPToolServer',
-	#superclass : 'MMCPAbstractServer',
+	#superclass : 'JRPCHTTPServer',
+	#classInstVars : [
+		'Default'
+	],
 	#category : 'MooseMCP',
 	#package : 'MooseMCP'
 }
 
+{ #category : 'accessing' }
+MMCPToolServer class >> default [
+
+	^ Default ifNil: [ Default := self new ]
+]
+
+{ #category : 'visualization' }
+MMCPToolServer >> asDot: edges [
+
+	^ String streamContents: [ :s |
+			  s
+				  nextPutAll: 'digraph G {';
+				  nextPut: Character lf.
+			  edges do: [ :ed |
+					  s nextPutAll: '  "' , (ed at: 'sourceId') asString , '" -> "'
+						  , (ed at: 'targetId') asString , '";'.
+					  s nextPut: Character lf ].
+			  s
+				  nextPutAll: '}';
+				  nextPut: Character lf ]
+]
+
+{ #category : 'visualization' }
+MMCPToolServer >> asMermaid: edges [
+
+	^ String streamContents: [ :s |
+			  s
+				  nextPutAll: 'graph TD';
+				  nextPut: Character lf.
+			  edges do: [ :ed |
+					  s nextPutAll: '  ' , (ed at: 'sourceId') asString , ' --> '
+						  , (ed at: 'targetId') asString.
+					  s nextPut: Character lf ] ]
+]
+
+{ #category : 'metrics' }
+MMCPToolServer >> computeMetric: aMetricName for: anEntity [
+
+	| selector raw |
+	selector := self metricSelectors at: aMetricName ifAbsent: [ ^ nil ].
+	raw := self safePerform: selector on: anEntity.
+	raw ifNil: [ ^ nil ].
+	(raw isKindOf: Collection) ifTrue: [ ^ raw size ].
+	^ raw
+]
+
 { #category : 'defaults' }
-MMCPToolServer class >> defaultPort [
+MMCPToolServer >> defaultPort [
 
-	^ 4444
+	^ 4445
 ]
 
-{ #category : 'tools-queries' }
-MMCPToolServer >> booleanQuery: aResourceName property: aProperty [
+{ #category : 'formatting' }
+MMCPToolServer >> describeEntity: anEntity [
 
-	<jrpc: #query:boolean>
-
-	self log: ('query:boolean: ' , aProperty asString , ' on: ', aResourceName asString).
-
-	^(FQBooleanQuery property: aProperty) executeOn: (interfacer getList: aResourceName)
+	| dict parent modifiers |
+	dict := Dictionary new.
+	dict at: 'id' put: anEntity mooseID asString.
+	dict at: 'name' put: (self safePerform: #name on: anEntity).
+	dict
+		at: 'qualifiedName'
+		put: (self safePerform: #mooseName on: anEntity).
+	dict at: 'type' put: anEntity class name.
+	dict at: 'comment' put: (self safePerform: #comment on: anEntity).
+	dict at: 'sourceAnchor' put: (self describeSourceAnchor: anEntity).
+	parent := self safePerform: #parentPackage on: anEntity.
+	dict
+		at: 'parentId'
+		put: (parent ifNotNil: [ parent mooseID asString ]).
+	modifiers := self safePerform: #modifiers on: anEntity.
+	dict at: 'modifiers' put: (modifiers ifNotNil: [
+			 (modifiers asOrderedCollection collect: #asString) asArray ]).
+	dict
+		at: 'numChildren'
+		put: ((self safePerform: #containedEntities on: anEntity)
+				 ifNil: [ 0 ]
+				 ifNotNil: [ :c | c size ]).
+	^ dict
 ]
 
-{ #category : 'tools-server' }
-MMCPToolServer >> commandMooseMCPServerVersion [
+{ #category : 'formatting' }
+MMCPToolServer >> describeModel: aModel includeStats: includeStats [
 
-	<jrpc: #'command:version'>
-
-	^ '0.1.0'
+	| dict |
+	dict := Dictionary new.
+	dict at: 'modelId' put: aModel name.
+	dict at: 'name' put: aModel name.
+	includeStats ifTrue: [
+			dict
+				at: 'numClasses'
+				put: (self entitiesOfType: 'Class' in: aModel) size.
+			dict
+				at: 'numMethods'
+				put: (self entitiesOfType: 'Method' in: aModel) size.
+			dict
+				at: 'numPackages'
+				put: (self entitiesOfType: 'Package' in: aModel) size ].
+	^ dict
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listAccessedEntities: aSourceMethod [
+{ #category : 'formatting' }
+MMCPToolServer >> describeSourceAnchor: anEntity [
 
-	<jrpc: #list:accessedEntites>
-
-	self log: ('list:accessedEntites for ', aSourceMethod).
-
-	^(interfacer getEntity: aSourceMethod)
-		accesses collect: #variable
+	| anchor dict |
+	anchor := self safePerform: #sourceAnchor on: anEntity.
+	anchor ifNil: [ ^ nil ].
+	dict := Dictionary new.
+	dict at: 'file' put: (self safePerform: #fileName on: anchor).
+	dict at: 'startLine' put: (self safePerform: #startLine on: anchor).
+	dict at: 'endLine' put: (self safePerform: #endLine on: anchor).
+	^ dict
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listAccessingMethods: aTargetEntity [
+{ #category : 'relationships' }
+MMCPToolServer >> edgeType: aType from: source to: target direction: aDirection [
 
-	<jrpc: #list:accessingMethods>
-
-	self log: ('list:accessingMethods for ', aTargetEntity).
-
-	^(interfacer getEntity: aTargetEntity)
-		incomingAccesses collect: #accessor
+	| dict |
+	dict := Dictionary new.
+	dict at: 'type' put: aType.
+	dict at: 'sourceId' put: source mooseID asString.
+	dict at: 'targetId' put: target mooseID asString.
+	dict at: 'direction' put: aDirection asString.
+	^ dict
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listEntitiesForType: aName [
+{ #category : 'model access' }
+MMCPToolServer >> entitiesOfType: aTypeName in: aModel [
 
-	<jrpc: #list:entitiesForType>
-
-	self log: ('list:entitiesForType: ' , aName).
-
-	^mooseModel metamodel classes
-		detect: [ :c | c name sameAs: aName ]
-		ifOne: [ :fmClass |
-			(mooseModel allWithType: fmClass implementingClass)
-				reject: #isStub
-		]
-		ifNone: [ #() ].
-
+	^ aModel metamodel classes
+		  detect: [ :c | c name sameAs: aTypeName ]
+		  ifOne: [ :fmClass |
+			  (aModel allWithType: fmClass implementingClass) reject: #isStub ]
+		  ifNone: [ #(  ) ]
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listEntityChildren: anEntity [
+{ #category : 'model access' }
+MMCPToolServer >> entityWithId: anId in: aModel [
 
-	<jrpc: #list:entityChildren>
-
-	self log: ('list:entityChildren for ', anEntity asString).
-
-	^(interfacer getEntity: anEntity)
-		children
+	^ aModel entityStorage
+		  detect: [ :e | e mooseID asString = anId ]
+		  ifNone: [ Error signal: 'Entity not found: ' , anId asString ]
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listEntityClients: anEntity [
+{ #category : 'tools-lookup' }
+MMCPToolServer >> getEntity: modelId query: aString entityId: anId entityType: typeName exactMatch: aBool limit: aLimit [
 
-	<jrpc: #list:entityClients>
-
-	self log: ('list:entityClients for ', anEntity).
-
-	^(interfacer getEntity: anEntity)
-		allClients
+	<jrpc: #'get:entity'>
+	| model candidates matches |
+	model := self modelNamed: modelId.
+	(anId isNil or: [ anId isEmpty ]) ifFalse: [
+			^ Array with:
+				  (self describeEntity: (self entityWithId: anId in: model)) ].
+	candidates := (typeName isNil or: [ typeName isEmpty ])
+		              ifTrue: [ model entityStorage ]
+		              ifFalse: [ self entitiesOfType: typeName in: model ].
+	matches := (candidates select: [ :e |
+			            | name |
+			            name := (self safePerform: #mooseName on: e) ifNil: [
+				                    '' ].
+			            aBool
+				            ifTrue: [ name = aString ]
+				            ifFalse: [
+				            name asLowercase includesSubstring:
+					            aString asLowercase ] ]) asOrderedCollection.
+	^ ((matches first: (matches size min: aLimit)) collect: [ :e |
+		   self describeEntity: e ]) asArray
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listEntityParents: anEntity [
+{ #category : 'tools-lookup' }
+MMCPToolServer >> getMetrics: modelId entityId: anId metrics: metricList groupBy: aGrouping [
 
-	<jrpc: #list:entityParents>
-
-	self log: ('list:entityParents for ', anEntity asString).
-
-	^(interfacer getEntity: anEntity)
-		parents
+	<jrpc: #'get:metrics'>
+	| model names targets |
+	model := self modelNamed: modelId.
+	names := (metricList isNil or: [ metricList isEmpty ])
+		         ifTrue: [
+		         self metricSelectors keys asSortedCollection
+			         asOrderedCollection ]
+		         ifFalse: [ metricList ].
+	targets := (anId isNil or: [ anId isEmpty ])
+		           ifTrue: [ self groupTargetsFor: model groupBy: aGrouping ]
+		           ifFalse: [
+		           OrderedCollection with:
+			           (self entityWithId: anId in: model) ].
+	^ (targets collect: [ :entity |
+			   | row metricsDict entityId |
+			   metricsDict := Dictionary new.
+			   names do: [ :m |
+				   metricsDict at: m put: (self computeMetric: m for: entity) ].
+			   row := Dictionary new.
+			   entityId := self safePerform: #mooseID on: entity.
+			   row
+				   at: 'entityId'
+				   put: (entityId ifNotNil: [ entityId asString ]).
+			   row at: 'metrics' put: metricsDict.
+			   row ]) asArray
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listEntityProperties: anEntity [
+{ #category : 'tools-lookup' }
+MMCPToolServer >> getRelationships: modelId entityId: anId types: typeList direction: aDirection depth: aDepth limit: aLimit [
 
-	<jrpc: #list:entityProperties>
-
-	| entity |
-	self log: 'list:entityProperties : ' , anEntity asString.
-
-	entity := (interfacer getEntity: anEntity).
-
-	^entity allProperties collect: [ :prop | prop name , ' : ' , (prop comment ifNil: ['']) ]
-
+	<jrpc: #'get:relationships'>
+	| model root edges visited frontier nextFrontier types dir |
+	model := self modelNamed: modelId.
+	root := self entityWithId: anId in: model.
+	types := (typeList isNil or: [ typeList isEmpty ])
+		         ifTrue: [ #( 'inheritance' 'invocation' ) ]
+		         ifFalse: [ typeList ].
+	dir := aDirection ifNil: [ 'both' ].
+	edges := OrderedCollection new.
+	visited := Set new.
+	visited add: root.
+	frontier := OrderedCollection with: root.
+	1 to: aDepth do: [ :level |
+			nextFrontier := OrderedCollection new.
+			frontier do: [ :e |
+					types do: [ :aType |
+							(dir = 'outgoing' or: [ dir = 'both' ]) ifTrue: [
+									(self relatedTo: e type: aType direction: #outgoing) do: [
+											:target |
+											edges add: (self
+													 edgeType: aType
+													 from: e
+													 to: target
+													 direction: #outgoing).
+											(visited includes: target) ifFalse: [
+													visited add: target.
+													nextFrontier add: target ] ] ].
+							(dir = 'incoming' or: [ dir = 'both' ]) ifTrue: [
+									(self relatedTo: e type: aType direction: #incoming) do: [
+											:source |
+											edges add: (self
+													 edgeType: aType
+													 from: source
+													 to: e
+													 direction: #incoming).
+											(visited includes: source) ifFalse: [
+													visited add: source.
+													nextFrontier add: source ] ] ] ] ].
+			frontier := nextFrontier ].
+	^ Dictionary new
+		  at: 'edges' put: (edges first: (edges size min: aLimit)) asArray;
+		  at: 'truncated' put: edges size > aLimit;
+		  yourself
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listEntityProviders: anEntity [
+{ #category : 'metrics' }
+MMCPToolServer >> groupTargetsFor: aModel groupBy: aGrouping [
 
-	<jrpc: #list:entityProviders>
-
-	self log: ('list:entityProviders for ', anEntity asString).
-
-	^(interfacer getEntity: anEntity)
-		allProviders
+	aGrouping = 'package' ifTrue: [
+		^ self entitiesOfType: 'Package' in: aModel ].
+	aGrouping = 'class' ifTrue: [
+		^ self entitiesOfType: 'Class' in: aModel ].
+	^ OrderedCollection with: aModel
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listEntityTypes [
+{ #category : 'initialization' }
+MMCPToolServer >> initialize [
 
-	<jrpc: #list:entityTypes>
-
-	self log: 'list:entityTypes'.
-
-	^mooseModel entityStorage allEntityTypes collect: [ :pharoClass |
-		(mooseModel metamodel fmTypeOf: pharoClass) name
-	]
+	super initialize.
+	self port: self defaultPort.
+	self addHandlersFromPragmasIn: self
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listImplementedInterface: aClass [
+{ #category : 'tools-lookup' }
+MMCPToolServer >> listModels: includeStats [
 
-	<jrpc: #list:implementedInterfaces>
-
-	self log: ('list:implementedInterfaces for ', aClass).
-
-	^(interfacer getEntity: aClass)
-		interfaceImplementations collect: #interface 
+	<jrpc: #'list:models'>
+	^ (MooseModel root allModels collect: [ :m |
+		   self describeModel: m includeStats: includeStats ]) asArray
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listImplementingClasses: anInterface [
+{ #category : 'metrics' }
+MMCPToolServer >> metricSelectors [
 
-	<jrpc: #list:implementingClasses>
-
-	self log: ('list:implementingClasses for ', anInterface).
-
-	^(interfacer getEntity: anInterface)
-		implementations collect: #implementingClass 
+	| dict |
+	dict := Dictionary new.
+	dict at: 'LOC' put: #numberOfLinesOfCode.
+	dict at: 'NOM' put: #numberOfMethods.
+	dict at: 'WMC' put: #wmc.
+	dict at: 'cyclomaticComplexity' put: #cyclomaticComplexity.
+	dict at: 'fanIn' put: #allClients.
+	dict at: 'fanOut' put: #allProviders.
+	dict at: 'numberOfChildren' put: #containedEntities.
+	dict at: 'DIT' put: #dit.
+	^ dict
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listInvokedMethods: aSourceMethod [
+{ #category : 'model access' }
+MMCPToolServer >> modelNamed: aModelId [
 
-	<jrpc: #list:invokedMethods>
-
-	self log: ('list:invokedMethods for ', aSourceMethod).
-
-	^(interfacer getEntity: aSourceMethod)
-		invokedMethods 
+	^ MooseModel root allModels
+		  detect: [ :m | m name = aModelId ]
+		  ifNone: [ Error signal: 'No model named ' , aModelId asString ]
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listInvokingMethods: aTargetMethod [
+{ #category : 'relationships' }
+MMCPToolServer >> relatedTo: anEntity type: aType direction: aDirection [
 
-	<jrpc: #list:invokingMethods>
-
-	self log: ('list:invokingMethods for ', aTargetMethod).
-
-	^(interfacer getEntity: aTargetMethod)
-		invokingMethods 
+	aType = 'inheritance' ifTrue: [
+			^ aDirection = #outgoing
+				  ifTrue: [
+						  (self safePerform: #superInheritances on: anEntity)
+							  ifNil: [ #(  ) ]
+							  ifNotNil: [ :c | c collect: #superclass ] ]
+				  ifFalse: [
+						  (self safePerform: #subInheritances on: anEntity)
+							  ifNil: [ #(  ) ]
+							  ifNotNil: [ :c | c collect: #subclass ] ] ].
+	aType = 'invocation' ifTrue: [
+			^ aDirection = #outgoing
+				  ifTrue: [
+				  (self safePerform: #invokedMethods on: anEntity) ifNil: [ #(  ) ] ]
+				  ifFalse: [
+				  (self safePerform: #invokingMethods on: anEntity) ifNil: [
+					  #(  ) ] ] ].
+	aType = 'access' ifTrue: [
+			^ aDirection = #outgoing
+				  ifTrue: [
+						  (self safePerform: #accesses on: anEntity)
+							  ifNil: [ #(  ) ]
+							  ifNotNil: [ :c | c collect: #variable ] ]
+				  ifFalse: [
+						  (self safePerform: #incomingAccesses on: anEntity)
+							  ifNil: [ #(  ) ]
+							  ifNotNil: [ :c | c collect: #accessor ] ] ].
+	^ aDirection = #outgoing
+		  ifTrue: [
+		  (self safePerform: #allProviders on: anEntity) ifNil: [ #(  ) ] ]
+		  ifFalse: [
+		  (self safePerform: #allClients on: anEntity) ifNil: [ #(  ) ] ]
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listPropertiesForType: aName [
+{ #category : 'tools-lookup' }
+MMCPToolServer >> renderVisualization: modelId visualization: aKind scope: aScope format: aFormat maxNodes: aMax [
 
-	<jrpc: #list:propertiesForType>
-
-	self log: ('list:propertiesForType ' , aName).
-
-	^mooseModel metamodel classes
-		detect: [ :c | c name sameAs: aName ]
-		ifOne: [ :fmClass |
-			fmClass allProperties collect: [ :prop | prop name , ' : ' , (prop comment ifNil: ['']) ]
-		]
-		ifNone: [ #() ].
-
+	<jrpc: #'render:visualization'>
+	| model edgeType direction rootTypeName roots edges nodes kept |
+	model := self modelNamed: modelId.
+	(aFormat = 'png' or: [ aFormat = 'svg' ]) ifTrue: [
+			^ Error signal:
+				  'Image rendering (png/svg) is not supported yet; use format: ''dot'' or ''mermaid''.' ].
+	aKind = 'inheritance_tree'
+		ifTrue: [
+				edgeType := 'inheritance'.
+				direction := #incoming.
+				rootTypeName := 'Class' ]
+		ifFalse: [
+				aKind = 'dependency_graph'
+					ifTrue: [
+							edgeType := 'dependency'.
+							direction := #outgoing.
+							rootTypeName := 'Package' ]
+					ifFalse: [
+							^ Error signal:
+								  'Visualization kind not yet supported: ' , aKind asString ] ].
+	roots := (aScope isNil or: [ aScope isEmpty ])
+		         ifTrue: [ self entitiesOfType: rootTypeName in: model ]
+		         ifFalse: [
+		         OrderedCollection with:
+			         (self entityWithId: aScope in: model) ].
+	edges := OrderedCollection new.
+	nodes := Set new.
+	roots do: [ :root |
+			(self relatedTo: root type: edgeType direction: direction) do: [
+					:other |
+					| edge |
+					edge := direction = #outgoing
+						        ifTrue: [
+								        self
+									        edgeType: edgeType
+									        from: root
+									        to: other
+									        direction: #outgoing ]
+						        ifFalse: [
+								        self
+									        edgeType: edgeType
+									        from: other
+									        to: root
+									        direction: #incoming ].
+					edges add: edge.
+					nodes
+						add: (edge at: 'sourceId');
+						add: (edge at: 'targetId') ] ].
+	nodes size > aMax ifTrue: [
+			kept := (nodes asOrderedCollection first: aMax) asSet.
+			edges := edges select: [ :edge |
+					         (kept includes: (edge at: 'sourceId')) and: [
+						         kept includes: (edge at: 'targetId') ] ] ].
+	^ aFormat = 'mermaid'
+		  ifTrue: [ self asMermaid: edges ]
+		  ifFalse: [ self asDot: edges ]
 ]
 
-{ #category : 'tools-list' }
-MMCPToolServer >> listSubClasses: aSuperClass [
+{ #category : 'utilities' }
+MMCPToolServer >> safePerform: aSelector on: anEntity [
 
-	<jrpc: #list:subClasses>
-
-	self log: ('list:subClasses for ', aSuperClass).
-
-	^(interfacer getEntity: aSuperClass)
-		subInheritances collect: #subclass 
-]
-
-{ #category : 'tools-list' }
-MMCPToolServer >> listSuperClasses: aSuperClass [
-
-	<jrpc: #list:superClasses>
-
-	self log: ('list:superClasses for ', aSuperClass).
-
-	^(interfacer getEntity: aSuperClass)
-		superInheritances collect: #superclass 
-]
-
-{ #category : 'tools-property' }
-MMCPToolServer >> propertyClassLackOfCohesion: anEntity [
-
-	<jrpc: #property:classLackOfCohesion>
-
-	| aClass |
-	self log: 'property:classLackOfCohesion for : ' , anEntity asString.
-
-	aClass := (interfacer getEntity: anEntity).
-	aClass isClass ifFalse: [ Error signal: 'Entity is not a class'  ].
-	^aClass lcom3 
-]
-
-{ #category : 'tools-property' }
-MMCPToolServer >> propertyHas: anEntity property: aPropertyName [
-
-	<jrpc: #property:hasProperty>
-
-	| entity |
-	self log: 'property:has : ' , anEntity asString , ' property: ' , aPropertyName.
-
-	entity := (interfacer getEntity: anEntity).
-
-	^entity allDeclaredProperties
-		detect: [ :prop | self property: prop matchesName: aPropertyName ]
-		ifOne: [ :prop | self asBooleanPropery: prop for: entity ]
-		ifNone: [ false ]
-
-]
-
-{ #category : 'tools-property' }
-MMCPToolServer >> propertyMethodCyclomaticComplexity: anEntity [
-
-	<jrpc: #property:methodCyclomaticComplexity>
-
-	| aClass |
-	self log: 'property:methodCyclomaticComplexity for : ' , anEntity asString.
-
-	aClass := (interfacer getEntity: anEntity).
-	aClass isMethod ifFalse: [ Error signal: 'Entity is not a method'  ].
-	^aClass cyclomaticComplexity 
-]
-
-{ #category : 'tools-property' }
-MMCPToolServer >> propertyMethodNumberOfStatements: anEntity [
-
-	<jrpc: #property:methodNumberOfStatements>
-
-	| aClass |
-	self log: 'property:methodNumberOfStatements for : ' , anEntity asString.
-
-	aClass := (interfacer getEntity: anEntity).
-	aClass isMethod ifFalse: [ Error signal: 'Entity is not a method'  ].
-	^aClass numberOfStatements 
-]
-
-{ #category : 'tools-property' }
-MMCPToolServer >> propertyPackageCohesion: anEntity [
-
-	<jrpc: #property:packageCohesion>
-
-	| package |
-	self log: 'property:packageCohesion for : ' , anEntity asString.
-
-	package := (interfacer getEntity: anEntity).
-	package isPackage ifFalse: [ Error signal: 'Entity is not a package' ].
-	^package martinCohesion 
-]
-
-{ #category : 'tools-property' }
-MMCPToolServer >> propertyPackageCoupling: anEntity [
-
-	<jrpc: #property:packageCoupling>
-
-	| package |
-	self log: 'property:packageCoupling for : ' , anEntity asString.
-
-	package := (interfacer getEntity: anEntity).
-	package isPackage ifFalse: [ Error signal: 'Entity is not a package' ].
-	^package efferentCoupling 
-]
-
-{ #category : 'tools-requests' }
-MMCPToolServer >> requestEntityName: anEntity [
-
-	<jrpc: #request:entityName>
-
-	self log: 'request:entityName for : ' , anEntity asString.
-
-	^(interfacer getEntity: anEntity ifAbsent: [^#()])
-		mooseName
-]
-
-{ #category : 'tools-requests' }
-MMCPToolServer >> requestEntityType: anEntity [
-
-	<jrpc: #request:entityType>
-
-	self log: 'request:entityType for : ' , anEntity asString.
-
-	^(interfacer getEntity: anEntity ifAbsent: [^#()])
-		class name
-]
-
-{ #category : 'tools-requests' }
-MMCPToolServer >> requestModelName [
-
-	<jrpc: #request:modelName>
-
-	self log: 'request:modelName'.
-
-	^mooseModel name
-]
-
-{ #category : 'tools-requests' }
-MMCPToolServer >> requestModelRepository [
-
-	<jrpc: #request:modelRepository>
-
-	self log: 'request:modelRepository'.
-
-	^'https://github.com/NicolasAnquetil/VerveineJ'
-]
-
-{ #category : 'tools-requests' }
-MMCPToolServer >> requestModelSize [
-
-	<jrpc: #request:modelSize>
-
-	self log: 'request:modelSize'.
-
-	^mooseModel size
-]
-
-{ #category : 'resources' }
-MMCPToolServer >> resourceModelReport: jsonSettings [
-
-	<jrpc: #'resource:model-report'>
-
-	| reporter |
-	self log: 'resource:model-report: ' , jsonSettings asString.
-
-	reporter := MiModelReportModel new.
-	reporter 	updateFromConfiguration: (MiModelReportSettingsConfiguration fromJson: jsonSettings).
-	reporter mooseModel: mooseModel.
-	reporter document.
-	^reporter rawReport
-
-]
-
-{ #category : 'resources' }
-MMCPToolServer >> resourcePackageDSM [
-
-	<jrpc: #'resource:package-dsm'>
-
-	self log: 'resource:package-dsm'.
-
-	"browser := MiDSMBrowser new.
-	browser followEntity: (mooseModel allModelPackages reject: [ :p | p types isEmpty ]).
-	browser diagram canvas exportToPNG"
-
-	^'/home/anquetil/Pharo/images/MooseMCP-250827/3934457036066856.png' asFileReference contents
+	^ [ anEntity perform: aSelector ]
+		  on: Error
+		  do: [ :ex | nil ]
 ]
