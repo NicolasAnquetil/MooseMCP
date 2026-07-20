@@ -1,13 +1,11 @@
 "
-I am an MCP tool server for Moose. I expose direct-lookup tools (list_models, get_entity, get_relationships, get_metrics, render_visualization) as JSON-RPC methods (JRPC) over HTTP, so an LLM client can inspect a Famix/Moose model.
+I hold the Moose/Famix business logic and model registry backing the MooseMCP tools (list_models, get_entity, get_relationships, get_metrics, render_visualization).
 
-To use:
-server := MMCPToolServer new.
-server start.
+I am a plain singleton (MMCPToolServer default) that the MMCP*Command classes delegate to.
 "
 Class {
 	#name : 'MMCPToolServer',
-	#superclass : 'JRPCHTTPServer',
+	#superclass : 'Object',
 	#classInstVars : [
 		'Default'
 	],
@@ -59,12 +57,6 @@ MMCPToolServer >> computeMetric: aMetricName for: anEntity [
 	raw ifNil: [ ^ nil ].
 	(raw isKindOf: Collection) ifTrue: [ ^ raw size ].
 	^ raw
-]
-
-{ #category : 'defaults' }
-MMCPToolServer >> defaultPort [
-
-	^ 4445
 ]
 
 { #category : 'formatting' }
@@ -161,7 +153,6 @@ MMCPToolServer >> entityWithId: anId in: aModel [
 { #category : 'tools-lookup' }
 MMCPToolServer >> getEntity: modelId query: aString entityId: anId entityType: typeName exactMatch: aBool limit: aLimit [
 
-	<jrpc: #'get:entity'>
 	| model candidates matches |
 	model := self modelNamed: modelId.
 	(anId isNil or: [ anId isEmpty ]) ifFalse: [
@@ -186,7 +177,6 @@ MMCPToolServer >> getEntity: modelId query: aString entityId: anId entityType: t
 { #category : 'tools-lookup' }
 MMCPToolServer >> getMetrics: modelId entityId: anId metrics: metricList groupBy: aGrouping [
 
-	<jrpc: #'get:metrics'>
 	| model names targets |
 	model := self modelNamed: modelId.
 	names := (metricList isNil or: [ metricList isEmpty ])
@@ -216,7 +206,6 @@ MMCPToolServer >> getMetrics: modelId entityId: anId metrics: metricList groupBy
 { #category : 'tools-lookup' }
 MMCPToolServer >> getRelationships: modelId entityId: anId types: typeList direction: aDirection depth: aDepth limit: aLimit [
 
-	<jrpc: #'get:relationships'>
 	| model root edges visited frontier nextFrontier types dir |
 	model := self modelNamed: modelId.
 	root := self entityWithId: anId in: model.
@@ -271,18 +260,9 @@ MMCPToolServer >> groupTargetsFor: aModel groupBy: aGrouping [
 	^ OrderedCollection with: aModel
 ]
 
-{ #category : 'initialization' }
-MMCPToolServer >> initialize [
-
-	super initialize.
-	self port: self defaultPort.
-	self addHandlersFromPragmasIn: self
-]
-
 { #category : 'tools-lookup' }
 MMCPToolServer >> listModels: includeStats [
 
-	<jrpc: #'list:models'>
 	^ (MooseModel root allModels collect: [ :m |
 		   self describeModel: m includeStats: includeStats ]) asArray
 ]
@@ -351,7 +331,6 @@ MMCPToolServer >> relatedTo: anEntity type: aType direction: aDirection [
 { #category : 'tools-lookup' }
 MMCPToolServer >> renderVisualization: modelId visualization: aKind scope: aScope format: aFormat maxNodes: aMax [
 
-	<jrpc: #'render:visualization'>
 	| model edgeType direction rootTypeName roots edges nodes kept |
 	model := self modelNamed: modelId.
 	(aFormat = 'png' or: [ aFormat = 'svg' ]) ifTrue: [
