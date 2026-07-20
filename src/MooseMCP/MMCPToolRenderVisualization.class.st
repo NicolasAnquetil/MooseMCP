@@ -1,8 +1,9 @@
 Class {
 	#name : 'MMCPToolRenderVisualization',
 	#superclass : 'MMCPTool',
-	#category : 'MooseMCP',
-	#package : 'MooseMCP'
+	#category : 'MooseMCP-Tools',
+	#package : 'MooseMCP',
+	#tag : 'Tools'
 }
 
 { #category : 'metadata' }
