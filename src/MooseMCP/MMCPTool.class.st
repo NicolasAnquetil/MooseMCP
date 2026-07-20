@@ -20,7 +20,13 @@ MMCPTool class >> groupName [
 { #category : 'testing' }
 MMCPTool class >> isAbstract [
 
-	^ true
+	^ self = MMCPTool
+]
+
+{ #category : 'testing' }
+MMCPTool class >> isBuiltIn [
+
+	^ self package = MMCPTool package
 ]
 
 { #category : 'as yet unclassified' }
