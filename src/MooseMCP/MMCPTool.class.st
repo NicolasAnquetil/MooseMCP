@@ -50,6 +50,20 @@ MMCPTool >> entityIdSchemaPropertyDescribed: aDescription [
 		  description: aDescription
 ]
 
+{ #category : 'executing' }
+MMCPTool >> executeWithRequest: aRequest [
+
+	^ self
+		  executeParsedRequestFrom: aRequest
+		  do: [ :parsedRequest |
+				  | result |
+				  result := (self commandForRequest: parsedRequest) execute.
+				  self
+					  successResultText: (self successSummaryForResult: result request: parsedRequest)
+					  data: result ]
+		  onError: [ :error :parsedRequest | self errorResultFor: error ]
+]
+
 { #category : 'private - schema' }
 MMCPTool >> modelIdSchemaPropertyDescribed: aDescription [
 
@@ -89,4 +103,10 @@ MMCPTool >> schemaStringPropertyNamed: propertyName description: propertyDescrip
 		  schemaPropertyNamed: propertyName
 		  type: 'string'
 		  description: propertyDescription
+]
+
+{ #category : 'private - results' }
+MMCPTool >> successSummaryForResult: result request: aRequest [
+
+	self subclassResponsibility
 ]

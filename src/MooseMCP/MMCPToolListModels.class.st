@@ -35,18 +35,10 @@ MMCPToolListModels >> description [
 	^ 'List Moose models currently loaded in the image, with basic entity-count stats.'
 ]
 
-{ #category : 'executing' }
-MMCPToolListModels >> executeWithRequest: aRequest [
+{ #category : 'private - results' }
+MMCPToolListModels >> successSummaryForResult: result request: aRequest [
 
-	^ self
-		  executeParsedRequestFrom: aRequest
-		  do: [ :parsedRequest |
-				  | result |
-				  result := (self commandForRequest: parsedRequest) execute.
-				  self
-					  successResultText: result size asString , ' model(s) found.'
-					  data: result ]
-		  onError: [ :error :parsedRequest | self errorResultFor: error ]
+	^ result size asString , ' model(s) found.'
 ]
 
 { #category : 'metadata' }

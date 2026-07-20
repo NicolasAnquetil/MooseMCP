@@ -52,18 +52,10 @@ MMCPToolGetEntity >> description [
 	^ 'Look up entities in a Moose model by name pattern or id, returning their properties.'
 ]
 
-{ #category : 'executing' }
-MMCPToolGetEntity >> executeWithRequest: aRequest [
+{ #category : 'private - results' }
+MMCPToolGetEntity >> successSummaryForResult: result request: aRequest [
 
-	^ self
-		  executeParsedRequestFrom: aRequest
-		  do: [ :parsedRequest |
-				  | result |
-				  result := (self commandForRequest: parsedRequest) execute.
-				  self
-					  successResultText: result size asString , ' entity(ies) found.'
-					  data: result ]
-		  onError: [ :error :parsedRequest | self errorResultFor: error ]
+	^ result size asString , ' entity(ies) found.'
 ]
 
 { #category : 'metadata' }

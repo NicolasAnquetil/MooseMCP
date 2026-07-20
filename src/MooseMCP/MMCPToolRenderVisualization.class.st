@@ -50,24 +50,12 @@ MMCPToolRenderVisualization >> description [
 	^ 'Render a dependency graph or inheritance tree of a Moose model (or a subset of it) as DOT or Mermaid text.'
 ]
 
-{ #category : 'executing' }
-MMCPToolRenderVisualization >> executeWithRequest: aRequest [
+{ #category : 'private - results' }
+MMCPToolRenderVisualization >> successSummaryForResult: result request: aRequest [
 
-	^ self
-		  executeParsedRequestFrom: aRequest
-		  do: [ :parsedRequest |
-				  | visualization format result |
-				  visualization := parsedRequest stringArgumentNamed:
-					                   'visualization'.
-				  format := parsedRequest
-					            stringArgumentNamed: 'format'
-					            default: 'mermaid'.
-				  result := (self commandForRequest: parsedRequest) execute.
-				  self
-					  successResultText:
-					  'Rendered ' , visualization , ' as ' , format , '.'
-					  data: result ]
-		  onError: [ :error :parsedRequest | self errorResultFor: error ]
+	^ 'Rendered ' , (aRequest stringArgumentNamed: 'visualization')
+	  , ' as '
+	  , (aRequest stringArgumentNamed: 'format' default: 'mermaid') , '.'
 ]
 
 { #category : 'metadata' }

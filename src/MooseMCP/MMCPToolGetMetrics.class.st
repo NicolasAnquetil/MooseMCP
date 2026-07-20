@@ -48,19 +48,10 @@ MMCPToolGetMetrics >> description [
 	^ 'Compute software metrics for an entity, or grouped across a whole Moose model.'
 ]
 
-{ #category : 'executing' }
-MMCPToolGetMetrics >> executeWithRequest: aRequest [
+{ #category : 'private - results' }
+MMCPToolGetMetrics >> successSummaryForResult: result request: aRequest [
 
-	^ self
-		  executeParsedRequestFrom: aRequest
-		  do: [ :parsedRequest |
-				  | result |
-				  result := (self commandForRequest: parsedRequest) execute.
-				  self
-					  successResultText:
-					  result size asString , ' metric row(s) computed.'
-					  data: result ]
-		  onError: [ :error :parsedRequest | self errorResultFor: error ]
+	^ result size asString , ' metric row(s) computed.'
 ]
 
 { #category : 'metadata' }

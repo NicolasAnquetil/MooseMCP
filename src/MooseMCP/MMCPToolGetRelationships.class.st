@@ -54,20 +54,10 @@ MMCPToolGetRelationships >> description [
 	^ 'Get relationships (inheritance, calls, references, accesses) for an entity in a Moose model.'
 ]
 
-{ #category : 'executing' }
-MMCPToolGetRelationships >> executeWithRequest: aRequest [
+{ #category : 'private - results' }
+MMCPToolGetRelationships >> successSummaryForResult: result request: aRequest [
 
-	^ self
-		  executeParsedRequestFrom: aRequest
-		  do: [ :parsedRequest |
-				  | result |
-				  result := (self commandForRequest: parsedRequest) execute.
-				  self
-					  successResultText:
-					  (result at: 'edges') size asString
-					  , ' relationship edge(s) found.'
-					  data: result ]
-		  onError: [ :error :parsedRequest | self errorResultFor: error ]
+	^ (result at: 'edges') size asString , ' relationship edge(s) found.'
 ]
 
 { #category : 'metadata' }
