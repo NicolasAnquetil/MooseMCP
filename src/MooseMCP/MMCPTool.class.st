@@ -41,6 +41,12 @@ MMCPTool class >> toolMutability [
 	^ #read
 ]
 
+{ #category : 'metadata' }
+MMCPTool >> buildOutputSchema [
+
+	^nil
+]
+
 { #category : 'private - execution' }
 MMCPTool >> commandForRequest: aRequest [
 
@@ -51,15 +57,6 @@ MMCPTool >> commandForRequest: aRequest [
 MMCPTool >> defaultOutputSchema [
 
 	^ nil
-]
-
-{ #category : 'private - schema' }
-MMCPTool >> entityIdSchemaPropertyDescribed: aDescription [
-
-	^ self
-		  schemaPropertyNamed: 'entityId'
-		  type: 'string'
-		  description: aDescription
 ]
 
 { #category : 'executing' }
@@ -77,18 +74,41 @@ MMCPTool >> executeWithRequest: aRequest [
 ]
 
 { #category : 'private - schema' }
-MMCPTool >> modelIdSchemaPropertyDescribed: aDescription [
+MMCPTool >> filterSpecSchema [
 
-	^ self
-		  schemaPropertyNamed: 'modelId'
-		  type: 'string'
-		  description: aDescription
+	^ MCPStructureProperties new
+		  type: 'object';
+		  description: 'One property filter.';
+		  properties: {
+				  (self
+					   schemaPropertyNamed: 'property'
+					   type: 'string'
+					   description:
+						   'Property name, e.g. name, isAbstract, numberOfLinesOfCode.').
+				  (self
+					   stringEnumSchemaPropertyNamed: 'operator'
+					   description: 'Comparison operator.'
+					   values:
+						   #( 'equals' 'notEquals' 'contains' 'matches' 'gt' 'gte' 'lt'
+						      'lte' 'in' )).
+				  (self
+					   schemaPropertyNamed: 'value'
+					   type: nil
+					   description: 'Value to compare against.') };
+		  required: #( 'property' 'operator' 'value' );
+		  additionalProperties: false;
+		  yourself
 ]
 
-{ #category : 'defaults' }
-MMCPTool >> mutability [
+{ #category : 'private - schema' }
+MMCPTool >> filtersSchemaProperty [
 
-	^ 'read'
+	^ (self
+		   schemaPropertyNamed: 'filters'
+		   type: 'array'
+		   description: 'Property filters to apply.')
+		  items: self filterSpecSchema;
+		  yourself
 ]
 
 { #category : 'private - schema' }
@@ -100,21 +120,6 @@ MMCPTool >> objectInputSchemaWithProperties: propertiesArray required: requiredA
 		  required: requiredArray;
 		  additionalProperties: false;
 		  yourself
-]
-
-{ #category : 'defaults' }
-MMCPTool >> risk [
-
-	^ 'low'
-]
-
-{ #category : 'private - schema' }
-MMCPTool >> schemaStringPropertyNamed: propertyName description: propertyDescription [
-
-	^ self
-		  schemaPropertyNamed: propertyName
-		  type: 'string'
-		  description: propertyDescription
 ]
 
 { #category : 'private - results' }

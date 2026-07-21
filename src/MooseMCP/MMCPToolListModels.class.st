@@ -1,6 +1,6 @@
 Class {
 	#name : 'MMCPToolListModels',
-	#superclass : 'MMCPTool',
+	#superclass : 'MMCPToolOnModel',
 	#category : 'MooseMCP-Tools',
 	#package : 'MooseMCP',
 	#tag : 'Tools'
@@ -24,8 +24,7 @@ MMCPToolListModels >> buildInputSchema [
 	^ self
 		  objectInputSchemaWithProperties: { (self
 				   booleanSchemaPropertyNamed: 'includeStats'
-				   description:
-				   'Include entity counts (packages/classes/methods) per model.'
+				   description: 'Include entity counts (packages/classes/methods) per model.'
 				   default: true) }
 		  required: #(  )
 ]

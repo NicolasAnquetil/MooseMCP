@@ -1,6 +1,6 @@
 Class {
 	#name : 'MMCPToolGetRelationships',
-	#superclass : 'MMCPTool',
+	#superclass : 'MMCPToolOnModel',
 	#category : 'MooseMCP-Tools',
 	#package : 'MooseMCP',
 	#tag : 'Tools'
@@ -23,10 +23,8 @@ MMCPToolGetRelationships >> buildInputSchema [
 
 	^ self
 		  objectInputSchemaWithProperties: {
-				  (self modelIdSchemaPropertyDescribed:
-					   'The model containing the entity.').
-				  (self entityIdSchemaPropertyDescribed:
-					   'The entity to get relationships for.').
+				  (self modelIdSchemaPropertyDescribed: 'The model containing the entity.').
+				  (self entityIdSchemaPropertyDescribed: 'The entity to get relationships for.').
 				  (self
 					   stringEnumArraySchemaNamed: 'types'
 					   description: 'Relationship types to include.'

@@ -85,12 +85,18 @@ MMCPToolTestCase >> buildFixture [
 ]
 
 { #category : 'private - calling' }
-MMCPToolTestCase >> callToolWith: someArguments [
+MMCPToolTestCase >> callTool: aToolClass with: someArguments [
 
 	| tool request |
-	tool := self toolClass new.
+	tool := aToolClass new.
 	request := tool requestFromToolCallArguments: someArguments.
 	^ (tool executeWithRequest: request) structuredContent at: #data
+]
+
+{ #category : 'private - calling' }
+MMCPToolTestCase >> callToolWith: someArguments [
+
+	^ self callTool: self toolClass with: someArguments
 ]
 
 { #category : 'private - fixture' }

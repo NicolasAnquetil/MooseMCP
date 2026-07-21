@@ -1,6 +1,6 @@
 Class {
 	#name : 'MMCPToolRenderVisualization',
-	#superclass : 'MMCPTool',
+	#superclass : 'MMCPToolOnModel',
 	#category : 'MooseMCP-Tools',
 	#package : 'MooseMCP',
 	#tag : 'Tools'

@@ -1,6 +1,6 @@
 Class {
 	#name : 'MMCPToolGetEntity',
-	#superclass : 'MMCPTool',
+	#superclass : 'MMCPToolOnModel',
 	#category : 'MooseMCP-Tools',
 	#package : 'MooseMCP',
 	#tag : 'Tools'
@@ -29,8 +29,7 @@ MMCPToolGetEntity >> buildInputSchema [
 					   type: 'string'
 					   description:
 					   'Qualified name, simple name, or substring pattern.').
-				  (self entityIdSchemaPropertyDescribed:
-					   'Exact Moose entity id; if given, query is ignored.').
+				  (self entityIdSchemaPropertyDescribed: 'Exact Moose entity id; if given, query is ignored.').
 				  (self
 					   stringEnumSchemaPropertyNamed: 'entityType'
 					   description: 'Filter by kind.'

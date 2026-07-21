@@ -1,6 +1,6 @@
 Class {
 	#name : 'MMCPToolGetMetrics',
-	#superclass : 'MMCPTool',
+	#superclass : 'MMCPToolOnModel',
 	#category : 'MooseMCP-Tools',
 	#package : 'MooseMCP',
 	#tag : 'Tools'
@@ -23,14 +23,11 @@ MMCPToolGetMetrics >> buildInputSchema [
 
 	^ self
 		  objectInputSchemaWithProperties: {
-				  (self modelIdSchemaPropertyDescribed:
-					   'The model to compute metrics in.').
-				  (self entityIdSchemaPropertyDescribed:
-					   'Entity to scope metrics to; omit to scope to the whole model.').
+				  (self modelIdSchemaPropertyDescribed: 'The model to compute metrics in.').
+				  (self entityIdSchemaPropertyDescribed: 'Entity to scope metrics to; omit to scope to the whole model.').
 				  (self
 					   stringEnumArraySchemaNamed: 'metrics'
-					   description:
-					   'Metrics to compute; omit for a sensible default set.'
+					   description: 'Metrics to compute; omit for a sensible default set.'
 					   itemDescription: 'A metric name.'
 					   values:
 						   #( 'LOC' 'NOM' 'WMC' 'cyclomaticComplexity'
