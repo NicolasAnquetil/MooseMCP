@@ -8,21 +8,21 @@ Class {
 	#superclass : 'TestCase',
 	#instVars : [
 		'model',
+		'uniqueModelName',
 		'package1',
 		'package2',
 		'baseClass',
 		'subClass',
 		'otherClass',
 		'isolatedClass',
+		'inheritance',
 		'baseMethod',
 		'subMethod',
 		'otherMethod',
+		'invocation',
+		'deepInvocation',
 		'attribute',
-		'inheritanceEdge',
-		'invocationEdge',
-		'deepInvocationEdge',
-		'accessEdge',
-		'uniqueModelName'
+		'access'
 	],
 	#category : 'MooseMCP-Tests-Tools',
 	#package : 'MooseMCP-Tests',
@@ -41,38 +41,19 @@ MMCPToolTestCase >> buildFixture [
 	model := FamixJavaModel named: self modelName.
 	package1 := model newPackageNamed: 'package1'.
 	package2 := model newPackageNamed: 'package2'.
-	baseClass := (model newClassNamed: 'BaseClass')
-		             parentPackage: package1.
-	subClass := (model newClassNamed: 'SubClass')
-		            parentPackage: package1.
-	otherClass := (model newClassNamed: 'OtherClass')
-		              parentPackage: package2.
-	isolatedClass := (model newClassNamed: 'IsolatedClass')
-		                 parentPackage: package2.
-	inheritanceEdge := FamixJavaInheritance new
-		                   subclass: subClass;
-		                   superclass: baseClass;
-		                   mooseModel: model.
-	baseMethod := (model newMethodNamed: 'baseMethod')
-		              parentType: baseClass.
-	subMethod := (model newMethodNamed: 'subMethod')
-		             parentType: subClass.
-	otherMethod := (model newMethodNamed: 'otherMethod')
-		               parentType: otherClass.
-	invocationEdge := FamixJavaInvocation new
-		                  sender: subMethod;
-		                  addCandidate: baseMethod;
-		                  mooseModel: model.
-	deepInvocationEdge := FamixJavaInvocation new
-		                      sender: otherMethod;
-		                      addCandidate: subMethod;
-		                      mooseModel: model.
-	attribute := (model newAttributeNamed: 'field1')
-		             parentType: otherClass.
-	accessEdge := FamixJavaAccess new
-		              accessor: otherMethod;
-		              variable: attribute;
-		              mooseModel: model.
+	baseClass := (model newClassNamed: 'BaseClass') parentPackage: package1.
+	subClass := (model newClassNamed: 'SubClass') parentPackage: package1.
+	otherClass := (model newClassNamed: 'OtherClass') parentPackage: package2.
+	isolatedClass := (model newClassNamed: 'IsolatedClass') parentPackage: package2.
+	inheritance := model newInheritance subclass: subClass ; superclass: baseClass.
+	baseMethod := (model newMethodNamed: 'baseMethod') parentType: baseClass.
+	subMethod := (model newMethodNamed: 'subMethod') parentType: subClass.
+	otherMethod := (model newMethodNamed: 'otherMethod') parentType: otherClass.
+	invocation := model newInvocation sender: subMethod ; addCandidate: baseMethod.
+	deepInvocation := model newInvocation sender: otherMethod ; addCandidate: subMethod.
+	attribute := (model newAttributeNamed: 'field1') parentType: otherClass.
+	access := model newAccess accessor: otherMethod ; variable: attribute.
+
 	MooseModel root add: model
 ]
 

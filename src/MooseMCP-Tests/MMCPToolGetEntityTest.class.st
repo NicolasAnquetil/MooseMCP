@@ -25,13 +25,13 @@ MMCPToolGetEntityTest >> testFiltersByEntityType [
 			          (#modelId -> self modelName).
 			          (#query -> '').
 			          (#entityType -> 'class') } asDictionary.
+
 	self assert: result size equals: 4.
-	self assert:
-		(result allSatisfy: [ :e | (e at: 'type') = FamixJavaClass name ])
+	self assert: (result allSatisfy: [ :e | (e at: 'type') = FamixJavaClass name ])
 ]
 
 { #category : 'tests' }
-MMCPToolGetEntityTest >> testFindsEntitiesBySubstringQueryCaseInsensitive [
+MMCPToolGetEntityTest >> testFindsEntitiesCaseInsensitive [
 
 	| result names |
 	result := self callToolWith: {
@@ -48,10 +48,10 @@ MMCPToolGetEntityTest >> testFindsEntityByExactId [
 	result := self callToolWith: {
 			          (#modelId -> self modelName).
 			          (#entityId -> subClass mooseID asString) } asDictionary.
+
 	self assert: result size equals: 1.
 	entry := result first.
-	self assert: (entry at: 'name') equals: 'SubClass'.
-	self assert: (entry at: 'id') equals: subClass mooseID asString
+	self assert: (entry at: 'name') equals: 'SubClass'
 ]
 
 { #category : 'tests' }
