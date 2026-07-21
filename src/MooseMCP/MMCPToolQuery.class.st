@@ -6,13 +6,13 @@ Class {
 	#tag : 'Tools'
 }
 
-{ #category : 'accessing' }
+{ #category : 'metadata' }
 MMCPToolQuery class >> commandClass [
 
 	^ MMCPQueryCommand
 ]
 
-{ #category : 'accessing' }
+{ #category : 'defaults' }
 MMCPToolQuery class >> toolName [
 
 	^ 'query'
@@ -38,7 +38,7 @@ MMCPToolQuery >> description [
 	^ 'Create a new entity set from a model, optionally filtered.'
 ]
 
-{ #category : 'executing' }
+{ #category : 'private - results' }
 MMCPToolQuery >> successSummaryForResult: result request: aRequest [
 
 	^ (result at: 'count') asString , ' entities in new set '

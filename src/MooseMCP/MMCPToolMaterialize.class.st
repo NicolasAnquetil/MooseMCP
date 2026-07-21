@@ -1,24 +1,24 @@
 Class {
 	#name : 'MMCPToolMaterialize',
-	#superclass : 'MMCPToolOnCollection',
+	#superclass : 'MMCPToolOnResultSet',
 	#category : 'MooseMCP-Tools',
 	#package : 'MooseMCP',
 	#tag : 'Tools'
 }
 
-{ #category : 'accessing' }
+{ #category : 'metadata' }
 MMCPToolMaterialize class >> commandClass [
 
 	^ MMCPMaterializeCommand
 ]
 
-{ #category : 'accessing' }
+{ #category : 'defaults' }
 MMCPToolMaterialize class >> toolName [
 
 	^ 'materialize'
 ]
 
-{ #category : 'schema' }
+{ #category : 'metadata' }
 MMCPToolMaterialize >> buildInputSchema [
 
 	^ self
@@ -46,7 +46,7 @@ MMCPToolMaterialize >> description [
 	^ 'Return actual entity details for a set, paginated.'
 ]
 
-{ #category : 'executing' }
+{ #category : 'private - results' }
 MMCPToolMaterialize >> successSummaryForResult: result request: aRequest [
 
 	^ (result at: 'items') size asString , ' of '

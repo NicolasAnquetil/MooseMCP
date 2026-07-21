@@ -1,24 +1,24 @@
 Class {
 	#name : 'MMCPToolTraverse',
-	#superclass : 'MMCPToolOnCollection',
+	#superclass : 'MMCPToolOnResultSet',
 	#category : 'MooseMCP-Tools',
 	#package : 'MooseMCP',
 	#tag : 'Tools'
 }
 
-{ #category : 'accessing' }
+{ #category : 'metadata' }
 MMCPToolTraverse class >> commandClass [
 
 	^ MMCPTraverseCommand
 ]
 
-{ #category : 'accessing' }
+{ #category : 'defaults' }
 MMCPToolTraverse class >> toolName [
 
 	^ 'traverse'
 ]
 
-{ #category : 'schema' }
+{ #category : 'metadata' }
 MMCPToolTraverse >> buildInputSchema [
 
 	^ self
@@ -44,7 +44,7 @@ MMCPToolTraverse >> description [
 	^ 'Follow a relationship from every entity in a set to produce a new set of related entities.'
 ]
 
-{ #category : 'executing' }
+{ #category : 'private - results' }
 MMCPToolTraverse >> successSummaryForResult: result request: aRequest [
 
 	^ (result at: 'count') asString , ' entities in new set '

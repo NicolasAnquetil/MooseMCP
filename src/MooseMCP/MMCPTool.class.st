@@ -35,7 +35,7 @@ MMCPTool class >> isBuiltIn [
 	^ self package = MMCPTool package
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'metadata' }
 MMCPTool class >> toolMutability [
 
 	^ #read

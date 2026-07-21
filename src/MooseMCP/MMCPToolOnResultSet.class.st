@@ -1,5 +1,5 @@
 Class {
-	#name : 'MMCPToolOnCollection',
+	#name : 'MMCPToolOnResultSet',
 	#superclass : 'MMCPTool',
 	#category : 'MooseMCP-Tools',
 	#package : 'MooseMCP',
@@ -7,13 +7,13 @@ Class {
 }
 
 { #category : 'testing' }
-MMCPToolOnCollection class >> isAbstract [
+MMCPToolOnResultSet class >> isAbstract [
 
-	^ self = MMCPToolOnCollection 
+	^ self = MMCPToolOnResultSet 
 ]
 
 { #category : 'private - schema' }
-MMCPToolOnCollection >> setIdSchemaPropertyDescribed: aDescription [
+MMCPToolOnResultSet >> setIdSchemaPropertyDescribed: aDescription [
 
 	^ self
 		  schemaPropertyNamed: 'setId'

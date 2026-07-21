@@ -1,18 +1,18 @@
 Class {
 	#name : 'MMCPToolFilterSet',
-	#superclass : 'MMCPToolOnCollection',
+	#superclass : 'MMCPToolOnResultSet',
 	#category : 'MooseMCP-Tools',
 	#package : 'MooseMCP',
 	#tag : 'Tools'
 }
 
-{ #category : 'accessing' }
+{ #category : 'metadata' }
 MMCPToolFilterSet class >> commandClass [
 
 	^ MMCPFilterSetCommand
 ]
 
-{ #category : 'accessing' }
+{ #category : 'defaults' }
 MMCPToolFilterSet class >> toolName [
 
 	^ 'filter_set'
