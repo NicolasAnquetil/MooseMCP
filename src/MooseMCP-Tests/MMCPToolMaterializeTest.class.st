@@ -17,9 +17,11 @@ MMCPToolMaterializeTest >> testCustomFields [
 				         (#property -> 'name').
 				         (#operator -> 'equals').
 				         (#value -> 'BaseClass') } asDictionary }) } asDictionary.
+
 	result := self callToolWith: {
 			          (#setId -> (seed at: 'setId')).
 			          (#fields -> #( 'name' )) } asDictionary.
+
 	item := (result at: 'items') first.
 	self assert: item keys asArray equals: #( 'name' )
 ]

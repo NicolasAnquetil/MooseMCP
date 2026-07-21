@@ -14,6 +14,7 @@ MMCPToolGetEntityTest >> testExactMatchExcludesPartialNames [
 			          (#modelId -> self modelName).
 			          (#query -> 'Base').
 			          (#exactMatch -> true) } asDictionary.
+
 	self assert: result isEmpty
 ]
 
@@ -27,7 +28,8 @@ MMCPToolGetEntityTest >> testFiltersByEntityType [
 			          (#entityType -> 'class') } asDictionary.
 
 	self assert: result size equals: 4.
-	self assert: (result allSatisfy: [ :e | (e at: 'type') = FamixJavaClass name ])
+	self assert:
+		(result allSatisfy: [ :e | (e at: 'type') = FamixJavaClass name ])
 ]
 
 { #category : 'tests' }
