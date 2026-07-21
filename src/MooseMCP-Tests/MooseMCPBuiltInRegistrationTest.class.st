@@ -15,8 +15,8 @@ MooseMCPBuiltInRegistrationTest >> testMooseToolsAreAutoDiscoveredAsBuiltIn [
 	| registry |
 	registry := self mcpWithoutObservabilityExport toolRegistry.
 	#( 'list_models' 'get_entity' 'get_relationships' 'get_metrics'
-	   'render_visualization' 'query' 'filter_set' 'traverse' 'materialize' )
-		do: [ :toolName |
+	   'render_visualization' 'query' 'filter_set' 'traverse' 'materialize'
+	   'remove_set' ) do: [ :toolName |
 		self assert: (registry includesToolNamed: toolName) ]
 ]
 
@@ -37,5 +37,6 @@ MooseMCPBuiltInRegistrationTest >> testMooseToolsGroupedTogetherAsMoose [
 			MMCPToolQuery.
 			MMCPToolFilterSet.
 			MMCPToolTraverse.
-			MMCPToolMaterialize } asSet
+			MMCPToolMaterialize.
+			MMCPToolRemoveSet } asSet
 ]
