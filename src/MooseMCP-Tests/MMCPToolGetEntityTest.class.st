@@ -55,6 +55,34 @@ MMCPToolGetEntityTest >> testFindsEntityByExactId [
 ]
 
 { #category : 'tests' }
+MMCPToolGetEntityTest >> testFindsEntityByExactName [
+
+	| result entry |
+	result := self callToolWith: {
+			          (#modelId -> self modelName).
+			          (#query -> 'BaseClass').
+			          (#exactMatch -> true) } asDictionary.
+
+	self assert: result size equals: 1.
+	entry := result first.
+	self assert: (entry at: 'name') equals: 'BaseClass'
+]
+
+{ #category : 'tests' }
+MMCPToolGetEntityTest >> testFindsEntityByPartialName [
+
+	| result entry |
+	result := self callToolWith: {
+			          (#modelId -> self modelName).
+			          (#query -> 'field').
+			          (#exactMatch -> false) } asDictionary.
+
+	self assert: result size equals: 1.
+	entry := result first.
+	self assert: (entry at: 'name') equals: 'field1'
+]
+
+{ #category : 'tests' }
 MMCPToolGetEntityTest >> testRaisesWhenModelIdUnknown [
 
 	self
