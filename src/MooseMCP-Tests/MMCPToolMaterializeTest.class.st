@@ -9,17 +9,9 @@ Class {
 { #category : 'tests' }
 MMCPToolMaterializeTest >> testCustomFields [
 
-	| seed result item |
-	seed := self callTool: MMCPToolQuery with: {
-			        (#modelId -> self modelName).
-			        (#entityType -> 'class').
-			        (#filters -> { {
-				         (#property -> 'name').
-				         (#operator -> 'equals').
-				         (#value -> 'BaseClass') } asDictionary }) } asDictionary.
-
+	| result item |
 	result := self callToolWith: {
-			          (#setId -> (seed at: 'setId')).
+			          (#setId -> baseClassSetId).
 			          (#fields -> #( 'name' )) } asDictionary.
 
 	item := (result at: 'items') first.
@@ -29,13 +21,9 @@ MMCPToolMaterializeTest >> testCustomFields [
 { #category : 'tests' }
 MMCPToolMaterializeTest >> testRespectsLimit [
 
-	| seed result |
-	seed := self callTool: MMCPToolQuery with: {
-			        (#modelId -> self modelName).
-			        (#entityType -> 'method') } asDictionary.
-
+	| result |
 	result := self callToolWith: {
-			          (#setId -> (seed at: 'setId')).
+			          (#setId -> allMethodsSetId).
 			          (#limit -> 1) } asDictionary.
 
 	self assert: (result at: 'total') equals: 3.
@@ -45,18 +33,15 @@ MMCPToolMaterializeTest >> testRespectsLimit [
 { #category : 'tests' }
 MMCPToolMaterializeTest >> testRespectsOffset [
 
-	| seed full atOffset1 atOffset2 |
-	seed := self callTool: MMCPToolQuery with: {
-			        (#modelId -> self modelName).
-			        (#entityType -> 'method') } asDictionary.
-
+	| full atOffset1 atOffset2 |
 	full := self callToolWith: {
-			        (#setId -> (seed at: 'setId')).
+			        (#setId -> allMethodsSetId).
 			        (#limit -> 3) } asDictionary.
+
 	self assert: (full at: 'items') size equals: 3.
 
 	atOffset1 := self callToolWith: {
-			             (#setId -> (seed at: 'setId')).
+			             (#setId -> allMethodsSetId).
 			             (#offset -> 1).
 			             (#limit -> 1) } asDictionary.
 	self
@@ -64,7 +49,7 @@ MMCPToolMaterializeTest >> testRespectsOffset [
 		equals: (full at: 'items') second.
 
 	atOffset2 := self callToolWith: {
-			             (#setId -> (seed at: 'setId')).
+			             (#setId -> allMethodsSetId).
 			             (#offset -> 2).
 			             (#limit -> 1) } asDictionary.
 	self
@@ -75,17 +60,9 @@ MMCPToolMaterializeTest >> testRespectsOffset [
 { #category : 'tests' }
 MMCPToolMaterializeTest >> testReturnsDefaultFields [
 
-	| seed result item |
-	seed := self callTool: MMCPToolQuery with: {
-			        (#modelId -> self modelName).
-			        (#entityType -> 'class').
-			        (#filters -> { {
-				         (#property -> 'name').
-				         (#operator -> 'equals').
-				         (#value -> 'BaseClass') } asDictionary }) } asDictionary.
-
+	| result item |
 	result := self callToolWith:
-		          { (#setId -> (seed at: 'setId')) } asDictionary.
+		          { (#setId -> baseClassSetId) } asDictionary.
 
 	self assert: (result at: 'total') equals: 1.
 	item := (result at: 'items') first.

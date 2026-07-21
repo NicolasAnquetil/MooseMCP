@@ -1,6 +1,6 @@
 Class {
 	#name : 'MMCPToolTraverseTest',
-	#superclass : 'MMCPToolTestCase',
+	#superclass : 'MMCPToolOnResultSetTestCase',
 	#category : 'MooseMCP-Tests-Tools',
 	#package : 'MooseMCP-Tests',
 	#tag : 'Tools'
@@ -11,21 +11,14 @@ MMCPToolTraverseTest >> testDepthExpandsTransitively [
 	"otherMethod invokes subMethod (deepInvocationEdge); subMethod invokes baseMethod (invocationEdge).
 	invokingMethods from baseMethod at depth 1 reaches subMethod only; at depth 2 also reaches otherMethod."
 
-	| seed result1 result2 |
-	seed := self callTool: MMCPToolQuery with: {
-			        (#modelId -> self modelName).
-			        (#entityType -> 'method').
-			        (#filters -> { {
-				         (#property -> 'name').
-				         (#operator -> 'equals').
-				         (#value -> 'baseMethod') } asDictionary }) } asDictionary.
+	| result1 result2 |
 	result1 := self callToolWith: {
-			           (#setId -> (seed at: 'setId')).
+			           (#setId -> baseMethodSetId).
 			           (#relationship -> 'invokingMethods').
 			           (#depth -> 1) } asDictionary.
 	self assert: (result1 at: 'count') equals: 1.
 	result2 := self callToolWith: {
-			           (#setId -> (seed at: 'setId')).
+			           (#setId -> baseMethodSetId).
 			           (#relationship -> 'invokingMethods').
 			           (#depth -> 2) } asDictionary.
 	self assert: (result2 at: 'count') equals: 2
@@ -34,16 +27,9 @@ MMCPToolTraverseTest >> testDepthExpandsTransitively [
 { #category : 'tests' }
 MMCPToolTraverseTest >> testFollowsMethodsRelationship [
 
-	| seed result |
-	seed := self callTool: MMCPToolQuery with: {
-			        (#modelId -> self modelName).
-			        (#entityType -> 'class').
-			        (#filters -> { {
-				         (#property -> 'name').
-				         (#operator -> 'equals').
-				         (#value -> 'BaseClass') } asDictionary }) } asDictionary.
+	| result |
 	result := self callToolWith: {
-			          (#setId -> (seed at: 'setId')).
+			          (#setId -> baseClassSetId).
 			          (#relationship -> 'methods') } asDictionary.
 	self assert: (result at: 'count') equals: 1.
 	self assert:
@@ -53,16 +39,9 @@ MMCPToolTraverseTest >> testFollowsMethodsRelationship [
 { #category : 'tests' }
 MMCPToolTraverseTest >> testFollowsSubclassesRelationship [
 
-	| seed result |
-	seed := self callTool: MMCPToolQuery with: {
-			        (#modelId -> self modelName).
-			        (#entityType -> 'class').
-			        (#filters -> { {
-				         (#property -> 'name').
-				         (#operator -> 'equals').
-				         (#value -> 'BaseClass') } asDictionary }) } asDictionary.
+	| result |
 	result := self callToolWith: {
-			          (#setId -> (seed at: 'setId')).
+			          (#setId -> baseClassSetId).
 			          (#relationship -> 'subclasses') } asDictionary.
 	self assert: (result at: 'count') equals: 1.
 	self assert:

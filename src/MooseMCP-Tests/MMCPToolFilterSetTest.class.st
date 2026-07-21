@@ -1,6 +1,6 @@
 Class {
 	#name : 'MMCPToolFilterSetTest',
-	#superclass : 'MMCPToolTestCase',
+	#superclass : 'MMCPToolOnResultSetTestCase',
 	#category : 'MooseMCP-Tests-Tools',
 	#package : 'MooseMCP-Tests',
 	#tag : 'Tools'
@@ -9,17 +9,15 @@ Class {
 { #category : 'tests' }
 MMCPToolFilterSetTest >> testNarrowsExistingSet [
 
-	| seed result |
-	seed := self callTool: MMCPToolQuery with: {
-			        (#modelId -> self modelName).
-			        (#entityType -> 'class') } asDictionary.
+	| result |
 	result := self callToolWith: {
-			          (#setId -> (seed at: 'setId')).
+			          (#setId -> allClassesSetId).
 			          (#filters -> { {
 				           (#property -> 'name').
 				           (#operator -> 'equals').
 				           (#value -> 'BaseClass') } asDictionary }) }
 			          asDictionary.
+
 	self assert: (result at: 'count') equals: 1
 ]
 
