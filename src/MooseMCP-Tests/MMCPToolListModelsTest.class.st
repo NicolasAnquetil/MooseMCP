@@ -7,11 +7,13 @@ Class {
 }
 
 { #category : 'tests' }
-MMCPToolListModelsTest >> testListsLoadedModelWithStats [
+MMCPToolListModelsTest >> testListsModelsWithStats [
 
 	| result entry |
 	result := self callToolWith: { (#includeStats -> true) } asDictionary.
+
 	entry := result detect: [ :e | (e at: 'modelId') = self modelName ].
+
 	self assert: (entry at: 'name') equals: self modelName.
 	self assert: (entry at: 'numClasses') equals: 4.
 	self assert: (entry at: 'numMethods') equals: 3.
@@ -19,12 +21,13 @@ MMCPToolListModelsTest >> testListsLoadedModelWithStats [
 ]
 
 { #category : 'tests' }
-MMCPToolListModelsTest >> testListsLoadedModelWithoutStats [
+MMCPToolListModelsTest >> testListsModelsWithoutStats [
 
 	| result entry |
-	result := self callToolWith:
-		          { (#includeStats -> false) } asDictionary.
+	result := self callToolWith: { (#includeStats -> false) } asDictionary.
+
 	entry := result detect: [ :e | (e at: 'modelId') = self modelName ].
+
 	self deny: (entry includesKey: 'numClasses').
 	self deny: (entry includesKey: 'numMethods').
 	self deny: (entry includesKey: 'numPackages')

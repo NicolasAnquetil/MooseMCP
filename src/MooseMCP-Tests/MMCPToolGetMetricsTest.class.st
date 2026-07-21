@@ -13,44 +13,47 @@ MMCPToolGetMetricsTest >> testComputesDefaultMetricSetForEntity [
 	result := self callToolWith: {
 			          (#modelId -> self modelName).
 			          (#entityId -> baseClass mooseID asString) } asDictionary.
+
 	self assert: result size equals: 1.
+
 	metrics := result first at: 'metrics'.
+
 	self assert: (metrics includesKey: 'LOC').
 	self assert: (metrics includesKey: 'NOM').
+	self assert: (metrics at: 'NOM') equals: 1.
 	self assert: (metrics includesKey: 'WMC').
 	self assert: (metrics includesKey: 'cyclomaticComplexity').
 	self assert: (metrics includesKey: 'fanIn').
 	self assert: (metrics includesKey: 'fanOut').
 	self assert: (metrics includesKey: 'numberOfChildren').
+	self assert: (metrics at: 'numberOfChildren') equals: 1.
 	self assert: (metrics includesKey: 'DIT').
-	self assert: (metrics at: 'NOM') equals: 1.
-	self assert: (metrics at: 'numberOfChildren') equals: 1
 ]
 
 { #category : 'tests' }
 MMCPToolGetMetricsTest >> testExplicitMetricsListRestrictsOutput [
 
-	| result metrics |
+	| result |
 	result := self callToolWith: {
 			          (#modelId -> self modelName).
 			          (#entityId -> baseClass mooseID asString).
 			          (#metrics -> #( 'LOC' 'NOM' )) } asDictionary.
-	metrics := result first at: 'metrics'.
-	self assert: metrics keys asSet equals: #( 'LOC' 'NOM' ) asSet
+
+	self assert: (result first at: 'metrics') keys asSet equals: #( 'LOC' 'NOM' ) asSet
 ]
 
 { #category : 'tests' }
 MMCPToolGetMetricsTest >> testFanInFanOutAreComputedAsCollectionSizesNotDedicatedMetrics [
-	"Regression test pinning a known characteristic: fanIn/fanOut are #allClients/#allProviders
-	collection sizes (computeMetric:for: collapses any Collection result to its #size), not a
-	dedicated fan-in/fan-out metric. baseClass has 2 allClients (subClass via inheritance, plus
-	the invocation-derived client relationship) and 0 allProviders in this fixture."
+	"fanIn/fanOut are #allClients/#allProviders collection sizes
+	BaseClass has 2 clients (SubClass via inheritance, and invocation-derived client relationship)
+	and 0 providers"
 
 	| result metrics |
 	result := self callToolWith: {
 			          (#modelId -> self modelName).
 			          (#entityId -> baseClass mooseID asString).
 			          (#metrics -> #( 'fanIn' 'fanOut' )) } asDictionary.
+
 	metrics := result first at: 'metrics'.
 	self assert: (metrics at: 'fanIn') equals: 2.
 	self assert: (metrics at: 'fanOut') equals: 0
@@ -64,7 +67,9 @@ MMCPToolGetMetricsTest >> testGroupsByClassAcrossWholeModel [
 			          (#modelId -> self modelName).
 			          (#metrics -> #( 'numberOfChildren' )).
 			          (#groupBy -> 'class') } asDictionary.
+
 	self assert: result size equals: 4.
+
 	byId := Dictionary new.
 	result do: [ :row |
 			byId
@@ -78,13 +83,16 @@ MMCPToolGetMetricsTest >> testGroupsByClassAcrossWholeModel [
 
 { #category : 'tests' }
 MMCPToolGetMetricsTest >> testGroupsByPackageAcrossWholeModel [
+	"bothe packages have 2 children"
 
 	| result |
 	result := self callToolWith: {
 			          (#modelId -> self modelName).
 			          (#metrics -> #( 'numberOfChildren' )).
 			          (#groupBy -> 'package') } asDictionary.
-	self assert: result size equals: 2
+
+	self assert: result size equals: 2.
+	self assert: (result allSatisfy: [ :e | ((e at: 'metrics') at: 'numberOfChildren') = 2 ])
 ]
 
 { #category : 'tests' }
