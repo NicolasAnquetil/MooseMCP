@@ -29,6 +29,12 @@ MMCPEntitySetRegistry class >> resetDefault [
 	Default := nil
 ]
 
+{ #category : 'registering' }
+MMCPEntitySetRegistry >> clear [
+
+	sets := Dictionary new
+]
+
 { #category : 'accessing' }
 MMCPEntitySetRegistry >> entitiesFor: aSetId [
 
@@ -55,6 +61,12 @@ MMCPEntitySetRegistry >> registerSet: aCollection [
 	setId := 'set-' , nextSetId asString.
 	sets at: setId put: aCollection.
 	^ setId
+]
+
+{ #category : 'registering' }
+MMCPEntitySetRegistry >> removeSet: aSetId [
+
+	sets removeKey: aSetId ifAbsent: [ ]
 ]
 
 { #category : 'accessing' }
