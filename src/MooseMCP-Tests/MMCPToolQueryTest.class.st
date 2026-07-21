@@ -20,7 +20,7 @@ MMCPToolQueryTest >> testAppliesFiltersWhenSeeding [
 			          asDictionary.
 	self assert: (result at: 'count') equals: 1.
 	self assert:
-		((result at: 'preview') first includesSubstring: 'BaseClass')
+		((result at: 'preview') anyOne includesSubstring: 'BaseClass')
 ]
 
 { #category : 'tests' }

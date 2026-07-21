@@ -35,7 +35,7 @@ MooseMCPToolDispatchTest >> testDispatchesGetEntityThroughRegistry [
 			        (#modelId -> self modelName).
 			        (#entityId -> baseClass mooseID asString) } asDictionary.
 	self assert: data size equals: 1.
-	entry := data first.
+	entry := data anyOne.
 	self assert: (entry at: 'name') equals: 'BaseClass'.
 	self assert: (entry at: 'id') equals: baseClass mooseID asString
 ]

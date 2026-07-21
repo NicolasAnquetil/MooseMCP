@@ -33,7 +33,7 @@ MMCPToolTraverseTest >> testFollowsMethodsRelationship [
 			          (#relationship -> 'methods') } asDictionary.
 	self assert: (result at: 'count') equals: 1.
 	self assert:
-		((result at: 'preview') first includesSubstring: 'baseMethod')
+		((result at: 'preview') anyOne includesSubstring: 'baseMethod')
 ]
 
 { #category : 'tests' }
@@ -45,7 +45,7 @@ MMCPToolTraverseTest >> testFollowsSubclassesRelationship [
 			          (#relationship -> 'subclasses') } asDictionary.
 	self assert: (result at: 'count') equals: 1.
 	self assert:
-		((result at: 'preview') first includesSubstring: 'SubClass')
+		((result at: 'preview') anyOne includesSubstring: 'SubClass')
 ]
 
 { #category : 'tests' }

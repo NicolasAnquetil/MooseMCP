@@ -16,7 +16,7 @@ MMCPToolGetMetricsTest >> testComputesDefaultMetricSetForEntity [
 
 	self assert: result size equals: 1.
 
-	metrics := result first at: 'metrics'.
+	metrics := result anyOne at: 'metrics'.
 
 	self assert: (metrics includesKey: 'LOC').
 	self assert: (metrics includesKey: 'NOM').
@@ -27,7 +27,7 @@ MMCPToolGetMetricsTest >> testComputesDefaultMetricSetForEntity [
 	self assert: (metrics includesKey: 'fanOut').
 	self assert: (metrics includesKey: 'numberOfChildren').
 	self assert: (metrics at: 'numberOfChildren') equals: 1.
-	self assert: (metrics includesKey: 'DIT').
+	self assert: (metrics includesKey: 'DIT')
 ]
 
 { #category : 'tests' }

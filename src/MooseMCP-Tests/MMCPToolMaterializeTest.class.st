@@ -65,7 +65,7 @@ MMCPToolMaterializeTest >> testReturnsDefaultFields [
 		          { (#setId -> baseClassSetId) } asDictionary.
 
 	self assert: (result at: 'total') equals: 1.
-	item := (result at: 'items') first.
+	item := (result at: 'items') anyOne.
 	self assert: (item at: 'name') equals: 'BaseClass'.
 	self assert: (item at: 'qualifiedName') equals: baseClass mooseName.
 	self assert: (item at: 'type') equals: FamixJavaClass name

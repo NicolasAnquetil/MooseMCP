@@ -17,7 +17,7 @@ MMCPToolGetRelationshipsTest >> testAccessRelationshipType [
 			          (#direction -> 'outgoing') } asDictionary.
 
 	self assert: (result at: 'edges') size equals: 1.
-	edge := (result at: 'edges') first.
+	edge := (result at: 'edges') anyOne.
 	self assert: (edge at: 'targetId') equals: attribute mooseID asString
 ]
 
@@ -72,7 +72,7 @@ MMCPToolGetRelationshipsTest >> testDirectionIncomingForInvocation [
 
 	self assert: (incoming at: 'edges') size equals: 1.
 	self
-		assert: ((incoming at: 'edges') first at: 'sourceId')
+		assert: ((incoming at: 'edges') anyOne at: 'sourceId')
 		equals: subMethod mooseID asString
 ]
 

@@ -52,7 +52,7 @@ MMCPToolGetEntityTest >> testFindsEntityByExactId [
 			          (#entityId -> subClass mooseID asString) } asDictionary.
 
 	self assert: result size equals: 1.
-	entry := result first.
+	entry := result anyOne.
 	self assert: (entry at: 'name') equals: 'SubClass'
 ]
 
@@ -66,7 +66,7 @@ MMCPToolGetEntityTest >> testFindsEntityByExactName [
 			          (#exactMatch -> true) } asDictionary.
 
 	self assert: result size equals: 1.
-	entry := result first.
+	entry := result anyOne.
 	self assert: (entry at: 'name') equals: 'BaseClass'
 ]
 
@@ -80,7 +80,7 @@ MMCPToolGetEntityTest >> testFindsEntityByPartialName [
 			          (#exactMatch -> false) } asDictionary.
 
 	self assert: result size equals: 1.
-	entry := result first.
+	entry := result anyOne.
 	self assert: (entry at: 'name') equals: 'field1'
 ]
 
