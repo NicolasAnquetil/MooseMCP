@@ -1,6 +1,6 @@
 Class {
 	#name : 'MMCPToolMaterializeTest',
-	#superclass : 'MMCPToolTestCase',
+	#superclass : 'MMCPToolOnResultSetTestCase',
 	#category : 'MooseMCP-Tests-Tools',
 	#package : 'MooseMCP-Tests',
 	#tag : 'Tools'
@@ -27,18 +27,49 @@ MMCPToolMaterializeTest >> testCustomFields [
 ]
 
 { #category : 'tests' }
-MMCPToolMaterializeTest >> testRespectsOffsetAndLimit [
+MMCPToolMaterializeTest >> testRespectsLimit [
 
 	| seed result |
 	seed := self callTool: MMCPToolQuery with: {
 			        (#modelId -> self modelName).
 			        (#entityType -> 'method') } asDictionary.
+
 	result := self callToolWith: {
 			          (#setId -> (seed at: 'setId')).
-			          (#offset -> 1).
 			          (#limit -> 1) } asDictionary.
+
 	self assert: (result at: 'total') equals: 3.
 	self assert: (result at: 'items') size equals: 1
+]
+
+{ #category : 'tests' }
+MMCPToolMaterializeTest >> testRespectsOffset [
+
+	| seed full atOffset1 atOffset2 |
+	seed := self callTool: MMCPToolQuery with: {
+			        (#modelId -> self modelName).
+			        (#entityType -> 'method') } asDictionary.
+
+	full := self callToolWith: {
+			        (#setId -> (seed at: 'setId')).
+			        (#limit -> 3) } asDictionary.
+	self assert: (full at: 'items') size equals: 3.
+
+	atOffset1 := self callToolWith: {
+			             (#setId -> (seed at: 'setId')).
+			             (#offset -> 1).
+			             (#limit -> 1) } asDictionary.
+	self
+		assert: (atOffset1 at: 'items') first
+		equals: (full at: 'items') second.
+
+	atOffset2 := self callToolWith: {
+			             (#setId -> (seed at: 'setId')).
+			             (#offset -> 2).
+			             (#limit -> 1) } asDictionary.
+	self
+		assert: (atOffset2 at: 'items') first
+		equals: (full at: 'items') third
 ]
 
 { #category : 'tests' }
@@ -52,8 +83,10 @@ MMCPToolMaterializeTest >> testReturnsDefaultFields [
 				         (#property -> 'name').
 				         (#operator -> 'equals').
 				         (#value -> 'BaseClass') } asDictionary }) } asDictionary.
+
 	result := self callToolWith:
 		          { (#setId -> (seed at: 'setId')) } asDictionary.
+
 	self assert: (result at: 'total') equals: 1.
 	item := (result at: 'items') first.
 	self assert: (item at: 'name') equals: 'BaseClass'.
