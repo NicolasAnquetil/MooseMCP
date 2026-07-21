@@ -39,33 +39,26 @@ MMCPToolTestCase class >> isAbstract [
 MMCPToolTestCase >> buildFixture [
 
 	model := FamixJavaModel named: self modelName.
-	package1 := (FamixJavaPackage named: 'package1') mooseModel: model.
-	package2 := (FamixJavaPackage named: 'package2') mooseModel: model.
-	baseClass := (FamixJavaClass named: 'BaseClass')
-		             parentPackage: package1;
-		             mooseModel: model.
-	subClass := (FamixJavaClass named: 'SubClass')
-		            parentPackage: package1;
-		            mooseModel: model.
-	otherClass := (FamixJavaClass named: 'OtherClass')
-		              parentPackage: package2;
-		              mooseModel: model.
-	isolatedClass := (FamixJavaClass named: 'IsolatedClass')
-		                 parentPackage: package2;
-		                 mooseModel: model.
+	package1 := model newPackageNamed: 'package1'.
+	package2 := model newPackageNamed: 'package2'.
+	baseClass := (model newClassNamed: 'BaseClass')
+		             parentPackage: package1.
+	subClass := (model newClassNamed: 'SubClass')
+		            parentPackage: package1.
+	otherClass := (model newClassNamed: 'OtherClass')
+		              parentPackage: package2.
+	isolatedClass := (model newClassNamed: 'IsolatedClass')
+		                 parentPackage: package2.
 	inheritanceEdge := FamixJavaInheritance new
 		                   subclass: subClass;
 		                   superclass: baseClass;
 		                   mooseModel: model.
-	baseMethod := (FamixJavaMethod named: 'baseMethod')
-		              parentType: baseClass;
-		              mooseModel: model.
-	subMethod := (FamixJavaMethod named: 'subMethod')
-		             parentType: subClass;
-		             mooseModel: model.
-	otherMethod := (FamixJavaMethod named: 'otherMethod')
-		               parentType: otherClass;
-		               mooseModel: model.
+	baseMethod := (model newMethodNamed: 'baseMethod')
+		              parentType: baseClass.
+	subMethod := (model newMethodNamed: 'subMethod')
+		             parentType: subClass.
+	otherMethod := (model newMethodNamed: 'otherMethod')
+		               parentType: otherClass.
 	invocationEdge := FamixJavaInvocation new
 		                  sender: subMethod;
 		                  addCandidate: baseMethod;
@@ -74,9 +67,8 @@ MMCPToolTestCase >> buildFixture [
 		                      sender: otherMethod;
 		                      addCandidate: subMethod;
 		                      mooseModel: model.
-	attribute := (FamixJavaAttribute named: 'field1')
-		             parentType: otherClass;
-		             mooseModel: model.
+	attribute := (model newAttributeNamed: 'field1')
+		             parentType: otherClass.
 	accessEdge := FamixJavaAccess new
 		              accessor: otherMethod;
 		              variable: attribute;
