@@ -43,8 +43,11 @@ MMCPTool class >> toolMutability [
 
 { #category : 'metadata' }
 MMCPTool >> buildOutputSchema [
-
-	^nil
+	| schema dataProperty |
+	schema := self standardOutputSchemaForDataProperties: #() required: #().
+	dataProperty := schema properties detect: [ :each | each name = 'data' ].
+	dataProperty type: nil; additionalProperties: true.
+	^ schema
 ]
 
 { #category : 'private - execution' }
