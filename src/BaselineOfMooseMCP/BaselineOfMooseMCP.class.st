@@ -20,11 +20,11 @@ BaselineOfMooseMCP >> baseline: spec [
 BaselineOfMooseMCP >> defineDependencies: spec [
 
 	spec
-		baseline: 'JRPC'
+		baseline: 'MCP'
 		with: [ 
 			spec
-				loads: #( Deployment );
-				repository: 'github://NicolasAnquetil/JRPC' ]
+				loads: #( Core );
+				repository: 'github://Evref-BL/MCP:main/src' ]
 ]
 
 { #category : 'packages' }
@@ -38,5 +38,5 @@ BaselineOfMooseMCP >> defineGroups: spec [
 BaselineOfMooseMCP >> definePackages: spec [
 
 	spec
-		package: 'MooseMCP' with: [ spec requires: #( JRPC ) ]
+		package: 'MooseMCP' with: [ spec requires: #( MCP ) ]
 ]
