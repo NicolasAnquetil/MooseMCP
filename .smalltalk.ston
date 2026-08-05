@@ -1,0 +1,18 @@
+SmalltalkCISpec {
+  #loading : [
+    SCIMetacelloLoadSpec {
+      #baseline : 'MooseMCP',
+      #directory : 'src',
+      #ignoreImage : true,
+      #onConflict : #useIncoming,
+      #onUpgrade : #useIncoming
+    }
+  ],
+  #testing : {
+    #packages : [ 'MooseMCP-Tests' ],
+    #coverage : {
+      #packages : [ 'MooseMCP' ],
+      #format : #lcov
+    }
+  }
+}
