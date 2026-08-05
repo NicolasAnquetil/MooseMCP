@@ -3,6 +3,7 @@ SmalltalkCISpec {
     SCIMetacelloLoadSpec {
       #baseline : 'MooseMCP',
       #directory : 'src',
+      #load : [ 'tests' ],
       #ignoreImage : true,
       #onConflict : #useIncoming,
       #onUpgrade : #useIncoming
