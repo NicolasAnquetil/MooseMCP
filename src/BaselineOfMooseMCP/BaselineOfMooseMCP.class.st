@@ -43,7 +43,7 @@ BaselineOfMooseMCP >> defineDependencies: spec [
 BaselineOfMooseMCP >> defineGroups: spec [
 
 	spec
-		group: 'default' with: #( 'MooseMCP' ) ;
+		group: 'default' with: #( MooseMCP Famix) ;
 		group: 'tests' with: #( default 'MooseMCP-Tests' )
 
 ]
