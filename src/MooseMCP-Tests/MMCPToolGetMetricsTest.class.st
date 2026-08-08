@@ -12,7 +12,8 @@ MMCPToolGetMetricsTest >> testComputesDefaultMetricSetForEntity [
 	| result metrics |
 	result := self callToolWith: {
 			          (#modelId -> self modelName).
-			          (#entityId -> baseClass mooseID asString) } asDictionary.
+			          (#entityId -> fixture baseClass mooseID asString) }
+			          asDictionary.
 
 	self assert: result size equals: 1.
 
@@ -36,10 +37,12 @@ MMCPToolGetMetricsTest >> testExplicitMetricsListRestrictsOutput [
 	| result |
 	result := self callToolWith: {
 			          (#modelId -> self modelName).
-			          (#entityId -> baseClass mooseID asString).
+			          (#entityId -> fixture baseClass mooseID asString).
 			          (#metrics -> #( 'LOC' 'NOM' )) } asDictionary.
 
-	self assert: (result first at: 'metrics') keys asSet equals: #( 'LOC' 'NOM' ) asSet
+	self
+		assert: (result first at: 'metrics') keys asSet
+		equals: #( 'LOC' 'NOM' ) asSet
 ]
 
 { #category : 'tests' }
@@ -51,7 +54,7 @@ MMCPToolGetMetricsTest >> testFanInFanOutAreComputedAsCollectionSizesNotDedicate
 	| result metrics |
 	result := self callToolWith: {
 			          (#modelId -> self modelName).
-			          (#entityId -> baseClass mooseID asString).
+			          (#entityId -> fixture baseClass mooseID asString).
 			          (#metrics -> #( 'fanIn' 'fanOut' )) } asDictionary.
 
 	metrics := result first at: 'metrics'.
@@ -75,10 +78,12 @@ MMCPToolGetMetricsTest >> testGroupsByClassAcrossWholeModel [
 			byId
 				at: (row at: 'entityId')
 				put: ((row at: 'metrics') at: 'numberOfChildren') ].
-	self assert: (byId at: baseClass mooseID asString) equals: 1.
-	self assert: (byId at: subClass mooseID asString) equals: 1.
-	self assert: (byId at: otherClass mooseID asString) equals: 2.
-	self assert: (byId at: isolatedClass mooseID asString) equals: 0
+	self assert: (byId at: fixture baseClass mooseID asString) equals: 1.
+	self assert: (byId at: fixture subClass mooseID asString) equals: 1.
+	self assert: (byId at: fixture otherClass mooseID asString) equals: 2.
+	self
+		assert: (byId at: fixture isolatedClass mooseID asString)
+		equals: 0
 ]
 
 { #category : 'tests' }

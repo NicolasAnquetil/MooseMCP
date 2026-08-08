@@ -28,7 +28,8 @@ MMCPToolRenderVisualizationTest >> testRendersDependencyGraphAsMermaid [
 			          (#format -> 'mermaid') } asDictionary.
 	self assert: (result beginsWith: 'graph TD').
 	self assert: (result includesSubstring:
-			 package2 mooseID asString , ' --> ' , subMethod mooseID asString)
+			 fixture package2 mooseID asString , ' --> '
+			 , fixture subMethod mooseID asString)
 ]
 
 { #category : 'tests' }
@@ -42,8 +43,9 @@ MMCPToolRenderVisualizationTest >> testRendersInheritanceTreeAsDot [
 	self
 		assert: result
 		equals:
-			'digraph G {' , String lf , '  "' , subClass mooseID asString
-			, '" -> "' , baseClass mooseID asString , '";' , String lf , '}'
+			'digraph G {' , String lf , '  "'
+			, fixture subClass mooseID asString , '" -> "'
+			, fixture baseClass mooseID asString , '";' , String lf , '}'
 			, String lf
 ]
 

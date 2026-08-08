@@ -49,7 +49,8 @@ MMCPToolGetEntityTest >> testFindsEntityByExactId [
 	| result entry |
 	result := self callToolWith: {
 			          (#modelId -> self modelName).
-			          (#entityId -> subClass mooseID asString) } asDictionary.
+			          (#entityId -> fixture subClass mooseID asString) }
+			          asDictionary.
 
 	self assert: result size equals: 1.
 	entry := result anyOne.

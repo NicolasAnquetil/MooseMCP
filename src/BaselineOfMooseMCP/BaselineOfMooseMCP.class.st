@@ -20,6 +20,10 @@ BaselineOfMooseMCP >> baseline: spec [
 BaselineOfMooseMCP >> defineDependencies: spec [
 
 	spec
+		baseline: 'Famix'
+		with: [ spec repository: 'github://moosetechnology/Famix:development/src' ].
+
+	spec
 		baseline: 'MCP'
 		with: [ 
 			spec
@@ -39,7 +43,7 @@ BaselineOfMooseMCP >> defineDependencies: spec [
 BaselineOfMooseMCP >> defineGroups: spec [
 
 	spec
-		group: 'default' with: #( 'MooseMCP' ) ;
+		group: 'default' with: #( MooseMCP Famix) ;
 		group: 'tests' with: #( default 'MooseMCP-Tests' )
 
 ]
