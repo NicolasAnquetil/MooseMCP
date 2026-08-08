@@ -20,7 +20,7 @@ MMCPGetRelationshipsCommand >> execute [
 		         default: #( 'inheritance' 'invocation' ).
 	direction := self request
 		             stringArgumentNamed: 'direction'
-		             default: 'both'.
+		             default: 'outgoing'.
 	depth := self request
 		         nonNegativeIntegerArgumentNamed: 'depth'
 		         default: 1.
@@ -32,7 +32,8 @@ MMCPGetRelationshipsCommand >> execute [
 	effectiveTypes := (types isNil or: [ types isEmpty ])
 		                  ifTrue: [ #( 'inheritance' 'invocation' ) ]
 		                  ifFalse: [ types ].
-	dir := direction ifNil: [ 'both' ].
+	self checkRelationshipTypes: effectiveTypes in: model.
+	dir := direction ifNil: [ 'outgoing' ].
 	edges := OrderedCollection new.
 	visited := Set new.
 	visited add: root.

@@ -47,6 +47,15 @@ MMCPCommand >> asMermaid: edges [
 ]
 
 { #category : 'model access' }
+MMCPCommand >> associationTypeNamesIn: aModel [
+
+	^ aModel metamodel classes
+		  select: [ :c |
+		  c implementingClass allTraits includes: FamixTAssociation ]
+		  thenCollect: #name
+]
+
+{ #category : 'model access' }
 MMCPCommand >> checkEntityType: aTypeName in: aModel [
 
 	((self namedEntityTypeNamesIn: aModel) anySatisfy: [ :name |
@@ -55,6 +64,21 @@ MMCPCommand >> checkEntityType: aTypeName in: aModel [
 				signalErrorCode: #EntityTypeUnknown
 				message: 'Unknown entity type: ' , aTypeName asString , '.'
 				details: { (#entityType -> aTypeName) } asDictionary ]
+]
+
+{ #category : 'model access' }
+MMCPCommand >> checkRelationshipTypes: someTypeNames in: aModel [
+
+	| validNames |
+	validNames := self associationTypeNamesIn: aModel.
+	someTypeNames do: [ :aTypeName |
+			(validNames anySatisfy: [ :name | name sameAs: aTypeName ])
+				ifFalse: [
+						MCPCommandError
+							signalErrorCode: #RelationshipTypeUnknown
+							message:
+							'Unknown relationship type: ' , aTypeName asString , '.'
+							details: { (#relationshipType -> aTypeName) } asDictionary ] ]
 ]
 
 { #category : 'metrics' }
