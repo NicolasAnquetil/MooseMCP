@@ -24,6 +24,17 @@ MMCPToolQueryTest >> testAppliesFiltersWhenSeeding [
 ]
 
 { #category : 'tests' }
+MMCPToolQueryTest >> testRaisesWhenEntityTypeUnknown [
+
+	self
+		should: [
+				self callToolWith: {
+						(#modelId -> self modelName).
+						(#entityType -> 'invocation') } asDictionary ]
+		raise: Error
+]
+
+{ #category : 'tests' }
 MMCPToolQueryTest >> testSeedsSetFromEntityType [
 
 	| result |
