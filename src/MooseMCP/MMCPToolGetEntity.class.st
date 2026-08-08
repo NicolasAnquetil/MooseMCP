@@ -29,11 +29,10 @@ MMCPToolGetEntity >> buildInputSchema [
 					   type: 'string'
 					   description:
 					   'Qualified name, simple name, or substring pattern.').
-				  (self entityIdSchemaPropertyDescribed: 'Exact Moose entity id; if given, query is ignored.').
-				  (self
-					   stringEnumSchemaPropertyNamed: 'entityType'
-					   description: 'Filter by kind.'
-					   values: #( 'package' 'class' 'method' 'attribute' 'variable' )).
+				  (self entityIdSchemaPropertyDescribed:
+					   'Exact Moose entity id; if given, query is ignored.').
+				  (self entityTypeSchemaPropertyDescribed:
+					   'Filter by kind: a Famix named-entity type for this model (e.g. Class, Method, Package, Attribute; case-insensitive). Valid names depend on the model''s metamodel.').
 				  (self
 					   booleanSchemaPropertyNamed: 'exactMatch'
 					   description:

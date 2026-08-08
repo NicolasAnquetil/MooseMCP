@@ -24,10 +24,8 @@ MMCPToolQuery >> buildInputSchema [
 	^ self
 		  objectInputSchemaWithProperties: {
 				  (self modelIdSchemaPropertyDescribed: 'The model to search in.').
-				  (self
-					   stringEnumSchemaPropertyNamed: 'entityType'
-					   description: 'Kind of entity to select.'
-					   values: #( 'package' 'class' 'method' 'attribute' 'variable' )).
+				  (self entityTypeSchemaPropertyDescribed:
+					   'Kind of entity to select: a Famix named-entity type for this model (e.g. Class, Method, Package, Attribute; case-insensitive). Valid names depend on the model''s metamodel.').
 				  self filtersSchemaProperty }
 		  required: #( 'modelId' 'entityType' )
 ]

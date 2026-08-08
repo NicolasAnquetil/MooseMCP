@@ -46,6 +46,17 @@ MMCPCommand >> asMermaid: edges [
 					  s nextPut: Character lf ] ]
 ]
 
+{ #category : 'model access' }
+MMCPCommand >> checkEntityType: aTypeName in: aModel [
+
+	((self namedEntityTypeNamesIn: aModel) anySatisfy: [ :name |
+		 name sameAs: aTypeName ]) ifFalse: [
+			MCPCommandError
+				signalErrorCode: #EntityTypeUnknown
+				message: 'Unknown entity type: ' , aTypeName asString , '.'
+				details: { (#entityType -> aTypeName) } asDictionary ]
+]
+
 { #category : 'metrics' }
 MMCPCommand >> computeMetric: aMetricName for: anEntity [
 
@@ -180,6 +191,15 @@ MMCPCommand >> modelNamed: aModelId [
 	^ MooseModel root allModels
 		  detect: [ :m | m name = aModelId ]
 		  ifNone: [ Error signal: 'No model named ' , aModelId asString ]
+]
+
+{ #category : 'model access' }
+MMCPCommand >> namedEntityTypeNamesIn: aModel [
+
+	^ aModel metamodel classes
+		  select: [ :c |
+		  c implementingClass allTraits includes: FamixTNamedEntity ]
+		  thenCollect: #name
 ]
 
 { #category : 'relationships' }
