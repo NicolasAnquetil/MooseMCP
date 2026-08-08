@@ -29,18 +29,6 @@ MMCPTool class >> isAbstract [
 	^ self = MMCPTool
 ]
 
-{ #category : 'testing' }
-MMCPTool class >> isBuiltIn [
-
-	^ self package = MMCPTool package
-]
-
-{ #category : 'metadata' }
-MMCPTool class >> toolMutability [
-
-	^ #read
-]
-
 { #category : 'metadata' }
 MMCPTool >> buildOutputSchema [
 	| schema dataProperty |
