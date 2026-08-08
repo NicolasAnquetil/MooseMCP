@@ -27,6 +27,7 @@ MMCPGetMetricsCommand >> execute [
 		         self metricSelectors keys asSortedCollection
 			         asOrderedCollection ]
 		         ifFalse: [ metrics ].
+	self checkMetrics: names in: model.
 	targets := (entityId isNil or: [ entityId isEmpty ])
 		           ifTrue: [ self groupTargetsFor: model groupBy: groupBy ]
 		           ifFalse: [

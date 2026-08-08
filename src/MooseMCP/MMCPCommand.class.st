@@ -66,6 +66,21 @@ MMCPCommand >> checkEntityType: aTypeName in: aModel [
 				details: { (#entityType -> aTypeName) } asDictionary ]
 ]
 
+{ #category : 'metrics' }
+MMCPCommand >> checkMetrics: someMetricNames in: aModel [
+
+	| discoveredNames |
+	discoveredNames := self numericPropertyNamesIn: aModel.
+	someMetricNames do: [ :aMetricName |
+			((self metricSelectors includesKey: aMetricName) or: [
+				 discoveredNames anySatisfy: [ :name | name sameAs: aMetricName ] ])
+				ifFalse: [
+						MCPCommandError
+							signalErrorCode: #MetricUnknown
+							message: 'Unknown metric: ' , aMetricName asString , '.'
+							details: { (#metric -> aMetricName) } asDictionary ] ]
+]
+
 { #category : 'model access' }
 MMCPCommand >> checkRelationshipTypes: someTypeNames in: aModel [
 
@@ -85,7 +100,9 @@ MMCPCommand >> checkRelationshipTypes: someTypeNames in: aModel [
 MMCPCommand >> computeMetric: aMetricName for: anEntity [
 
 	| selector raw |
-	selector := self metricSelectors at: aMetricName ifAbsent: [ ^ nil ].
+	selector := self metricSelectors
+		            at: aMetricName
+		            ifAbsent: [ aMetricName asSymbol ].
 	raw := self safePerform: selector on: anEntity.
 	raw ifNil: [ ^ nil ].
 	(raw isKindOf: Collection) ifTrue: [ ^ raw size ].
@@ -224,6 +241,21 @@ MMCPCommand >> namedEntityTypeNamesIn: aModel [
 		  select: [ :c |
 		  c implementingClass allTraits includes: FamixTNamedEntity ]
 		  thenCollect: #name
+]
+
+{ #category : 'metrics' }
+MMCPCommand >> numericPropertyNamesIn: aModel [
+
+	| names |
+	names := Set new.
+	aModel metamodel classes
+		select: [ :c |
+		c implementingClass allTraits includes: FamixTNamedEntity ]
+		thenDo: [ :c |
+				c allProperties
+					select: [ :p | p type isKindOf: FM3Number ]
+					thenDo: [ :p | names add: p name ] ].
+	^ names
 ]
 
 { #category : 'relationships' }
