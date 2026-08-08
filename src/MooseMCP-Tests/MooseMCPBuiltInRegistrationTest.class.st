@@ -9,21 +9,6 @@ Class {
 	#tag : 'Tools'
 }
 
-{ #category : 'running' }
-MooseMCPBuiltInRegistrationTest >> registerMooseMCPTools [
-
-	MMCPTool withAllSubclasses do: [ :c |
-		c isAbstract
-			ifFalse: [ self toolRegistry registerToolClass: c] ].
-]
-
-{ #category : 'running' }
-MooseMCPBuiltInRegistrationTest >> setUp [
-	super setUp.
-
-	self registerMooseMCPTools
-]
-
 { #category : 'tests' }
 MooseMCPBuiltInRegistrationTest >> testMooseToolsAreAutoDiscoveredAsBuiltIn [
 
@@ -51,10 +36,4 @@ MooseMCPBuiltInRegistrationTest >> testMooseToolsGroupedTogetherAsMoose [
 			MMCPToolTraverse.
 			MMCPToolMaterialize.
 			MMCPToolRemoveSet } asSet
-]
-
-{ #category : 'running' }
-MooseMCPBuiltInRegistrationTest >> toolRegistry [
-
-	^mcpServer toolRegistry
 ]

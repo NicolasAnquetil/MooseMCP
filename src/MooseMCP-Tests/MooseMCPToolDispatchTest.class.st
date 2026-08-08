@@ -3,7 +3,7 @@ I verify that the Moose tools remain correctly wired end-to-end through the real
 "
 Class {
 	#name : 'MooseMCPToolDispatchTest',
-	#superclass : 'TestCase',
+	#superclass : 'MooseMCPWithServerAbstractTest',
 	#instVars : [
 		'fixture'
 	],
@@ -15,11 +15,9 @@ Class {
 { #category : 'private - calling' }
 MooseMCPToolDispatchTest >> rpcCall: aToolName with: someArguments [
 
-	| mcp result structuredContent |
-	mcp := MCP new
-		       monitoringExportDirectory: nil;
-		       yourself.
-	result := mcp rpcToolCall: 'tool_call' withParams: {
+	| result structuredContent |
+
+	result := mcpServer rpcToolCall: 'tool_call' withParams: {
 			          (#toolName -> aToolName).
 			          (#arguments -> someArguments) } asDictionary.
 	structuredContent := result at: #structuredContent.
