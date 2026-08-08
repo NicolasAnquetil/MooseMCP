@@ -1,31 +1,46 @@
 "
-Verifies that the five Moose tools are auto-discovered as built-in by a freshly constructed MCPToolRegistry (via MCPTool class>>concreteSubclasses/isBuiltIn), without any explicit registerToolClass: call.
+Verifies that the five Moose tools are auto-discovered
 "
 Class {
 	#name : 'MooseMCPBuiltInRegistrationTest',
 	#superclass : 'MCPTestCase',
+	#instVars : [
+		'toolRegistry'
+	],
 	#category : 'MooseMCP-Tests-Tools',
 	#package : 'MooseMCP-Tests',
 	#tag : 'Tools'
 }
 
+{ #category : 'running' }
+MooseMCPBuiltInRegistrationTest >> registerMooseMCPTools [
+
+	MMCPTool withAllSubclasses do: [ :c |
+		c isAbstract ifFalse: [ toolRegistry registerToolClass: c] ].
+]
+
+{ #category : 'running' }
+MooseMCPBuiltInRegistrationTest >> setUp [
+	super setUp.
+
+	toolRegistry := self mcpWithoutObservabilityExport toolRegistry.
+	self registerMooseMCPTools
+]
+
 { #category : 'tests' }
 MooseMCPBuiltInRegistrationTest >> testMooseToolsAreAutoDiscoveredAsBuiltIn [
 
-	| registry |
-	registry := self mcpWithoutObservabilityExport toolRegistry.
 	#( 'list_models' 'get_entity' 'get_relationships' 'get_metrics'
 	   'render_visualization' 'query' 'filter_set' 'traverse' 'materialize'
 	   'remove_set' ) do: [ :toolName |
-		self assert: (registry includesToolNamed: toolName) ]
+		self assert: (toolRegistry includesToolNamed: toolName) ]
 ]
 
 { #category : 'tests' }
 MooseMCPBuiltInRegistrationTest >> testMooseToolsGroupedTogetherAsMoose [
 
-	| registry mooseGroup |
-	registry := self mcpWithoutObservabilityExport toolRegistry.
-	mooseGroup := (registry publicToolGroups
+	| mooseGroup |
+	mooseGroup := (toolRegistry publicToolGroups
 		               detect: [ :each | each key = 'moose' ]
 		               ifNone: [ self fail ]) value.
 	self assert: mooseGroup asSet equals: {
