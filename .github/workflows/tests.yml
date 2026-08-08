@@ -9,4 +9,6 @@ on:
 jobs:
   run:
     uses: moosetechnology/.github/.github/workflows/run-tests.yml@main
+    with:
+      run-coverage: true
     secrets: inherit
