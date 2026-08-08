@@ -21,3 +21,9 @@ mcp := MCP new.
 mcp port: 4000.
 mcp start.
 ```
+Additionaly the MooseMCP tools have to be recorded in the MCPToolRegistry.
+This is a temporary step that should be removed in the future):
+```st
+MMCPTool withAllSubclasses do: [ :c |
+	c isAbstract ifFalse: [ mcp toolRegistry registerToolClass: c] ].
+```
