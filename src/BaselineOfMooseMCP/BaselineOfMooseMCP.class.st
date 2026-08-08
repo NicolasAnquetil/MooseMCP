@@ -20,6 +20,10 @@ BaselineOfMooseMCP >> baseline: spec [
 BaselineOfMooseMCP >> defineDependencies: spec [
 
 	spec
+		baseline: 'Famix'
+		with: [ spec repository: 'github://moosetechnology/Famix:development/src' ].
+
+	spec
 		baseline: 'MCP'
 		with: [ 
 			spec
