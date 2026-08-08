@@ -24,11 +24,18 @@ MMCPToolOnResultSetTestCase >> setUp [
 	super setUp.
 
 	allClassesSetId := MMCPEntitySetRegistry default registerSet:
-		                   (OrderedCollection withAll: { baseClass . subClass . otherClass . isolatedClass}).
+		                   (OrderedCollection withAll: {
+				                    fixture baseClass.
+				                    fixture subClass.
+				                    fixture otherClass.
+				                    fixture isolatedClass }).
 	allMethodsSetId := MMCPEntitySetRegistry default registerSet:
-		                   (OrderedCollection withAll: {baseMethod . subMethod . otherMethod}).
+		                   (OrderedCollection withAll: {
+				                    fixture baseMethod.
+				                    fixture subMethod.
+				                    fixture otherMethod }).
 	baseClassSetId := MMCPEntitySetRegistry default registerSet:
-		                  (OrderedCollection with: baseClass).
+		                  (OrderedCollection with: fixture baseClass).
 	baseMethodSetId := MMCPEntitySetRegistry default registerSet:
-		                   (OrderedCollection with: baseMethod)
+		                   (OrderedCollection with: fixture baseMethod)
 ]
