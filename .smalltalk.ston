@@ -10,10 +10,6 @@ SmalltalkCISpec {
     }
   ],
   #testing : {
-    #packages : [ 'MooseMCP-Tests' ],
-    #coverage : {
-      #packages : [ 'MooseMCP' ],
-      #format : #lcov
-    }
+    #packages : [ 'MooseMCP-Tests' ]
   }
 }
