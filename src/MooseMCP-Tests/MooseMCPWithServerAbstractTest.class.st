@@ -10,22 +10,13 @@ Class {
 }
 
 { #category : 'running' }
-MooseMCPWithServerAbstractTest >> registerMooseMCPTools [
-
-	MMCPTool withAllSubclasses do: [ :c |
-		c isAbstract
-			ifFalse: [ self toolRegistry registerToolClass: c] ].
-]
-
-{ #category : 'running' }
 MooseMCPWithServerAbstractTest >> setUp [
 	super setUp.
 
 	mcpServer := MCP new
 		monitoringExportDirectory: nil;
 		useContentAndStructuredContentToolResponses;
-		yourself.
-	self registerMooseMCPTools
+		yourself
 ]
 
 { #category : 'running' }

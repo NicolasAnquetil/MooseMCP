@@ -32,7 +32,7 @@ MMCPTool class >> isAbstract [
 { #category : 'metadata' }
 MMCPTool class >> shouldAutoRegister [
 
-	^true
+	^self isAbstract not
 ]
 
 { #category : 'metadata' }
