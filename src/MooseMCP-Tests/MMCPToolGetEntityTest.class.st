@@ -86,6 +86,18 @@ MMCPToolGetEntityTest >> testFindsEntityByPartialName [
 ]
 
 { #category : 'tests' }
+MMCPToolGetEntityTest >> testRaisesWhenEntityTypeUnknown [
+
+	self
+		should: [
+				self callToolWith: {
+						(#modelId -> self modelName).
+						(#query -> '').
+						(#entityType -> 'invocation') } asDictionary ]
+		raise: Error
+]
+
+{ #category : 'tests' }
 MMCPToolGetEntityTest >> testRaisesWhenModelIdUnknown [
 
 	self

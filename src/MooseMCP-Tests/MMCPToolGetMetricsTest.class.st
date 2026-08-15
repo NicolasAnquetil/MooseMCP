@@ -32,6 +32,21 @@ MMCPToolGetMetricsTest >> testComputesDefaultMetricSetForEntity [
 ]
 
 { #category : 'tests' }
+MMCPToolGetMetricsTest >> testComputesDiscoveredNumericProperty [
+	"weightedMethodCount is a real FM3 Number-typed property, not one of the curated
+	short-name aliases (LOC/NOM/WMC/...); it should still be computable by its own name."
+
+	| result metrics |
+	result := self callToolWith: {
+			          (#modelId -> self modelName).
+			          (#entityId -> fixture baseClass mooseID asString).
+			          (#metrics -> #( 'weightedMethodCount' )) } asDictionary.
+	metrics := result anyOne at: 'metrics'.
+	self assert: (metrics includesKey: 'weightedMethodCount').
+	self assert: (metrics at: 'weightedMethodCount') isNumber
+]
+
+{ #category : 'tests' }
 MMCPToolGetMetricsTest >> testExplicitMetricsListRestrictsOutput [
 
 	| result |
@@ -108,6 +123,18 @@ MMCPToolGetMetricsTest >> testRaisesWhenEntityIdUnknown [
 				self callToolWith: {
 						(#modelId -> self modelName).
 						(#entityId -> 'nope') } asDictionary ]
+		raise: Error
+]
+
+{ #category : 'tests' }
+MMCPToolGetMetricsTest >> testRaisesWhenMetricUnknown [
+
+	self
+		should: [
+				self callToolWith: {
+						(#modelId -> self modelName).
+						(#entityId -> fixture baseClass mooseID asString).
+						(#metrics -> #( 'bogus' )) } asDictionary ]
 		raise: Error
 ]
 

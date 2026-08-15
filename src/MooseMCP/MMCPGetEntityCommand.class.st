@@ -29,7 +29,9 @@ MMCPGetEntityCommand >> execute [
 				  (self describeEntity: (self entityWithId: entityId in: model)) ].
 	candidates := (entityType isNil or: [ entityType isEmpty ])
 		              ifTrue: [ model entityStorage ]
-		              ifFalse: [ self entitiesOfType: entityType in: model ].
+		              ifFalse: [
+				              self checkEntityType: entityType in: model.
+				              self entitiesOfType: entityType in: model ].
 	matches := (candidates select: [ :e |
 			            | name |
 			            name := (self safePerform: #mooseName on: e) ifNil: [

@@ -19,6 +19,7 @@ MMCPQueryCommand >> execute [
 		           arrayArgumentNamed: 'filters'
 		           ifAbsent: [ #(  ) ].
 	model := self modelNamed: modelId.
+	self checkEntityType: entityType in: model.
 	candidates := self entitiesOfType: entityType in: model.
 	filtered := filters isEmpty
 		            ifTrue: [ candidates ]

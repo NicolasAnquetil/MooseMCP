@@ -24,6 +24,20 @@ MMCPToolGetRelationshipsTest >> testAccessRelationshipType [
 ]
 
 { #category : 'tests' }
+MMCPToolGetRelationshipsTest >> testDefaultDirectionIsOutgoingOnly [
+	"baseMethod has no outgoing inheritance/invocation of its own; subMethod's invocation of
+	baseMethod is only visible from baseMethod's incoming side, which the default direction
+	(outgoing) should not include."
+
+	| result |
+	result := self callToolWith: {
+			          (#modelId -> self modelName).
+			          (#entityId -> fixture baseMethod mooseID asString) }
+			          asDictionary.
+	self assert: (result at: 'edges') isEmpty
+]
+
+{ #category : 'tests' }
 MMCPToolGetRelationshipsTest >> testDefaultTypesReturnInheritanceEdge [
 
 	| result edge |
@@ -137,6 +151,18 @@ MMCPToolGetRelationshipsTest >> testRaisesWhenEntityIdUnknown [
 				self callToolWith: {
 						(#modelId -> self modelName).
 						(#entityId -> 'nope') } asDictionary ]
+		raise: Error
+]
+
+{ #category : 'tests' }
+MMCPToolGetRelationshipsTest >> testRaisesWhenRelationshipTypeUnknown [
+
+	self
+		should: [
+				self callToolWith: {
+						(#modelId -> self modelName).
+						(#entityId -> fixture baseClass mooseID asString).
+						(#types -> #( 'bogus' )) } asDictionary ]
 		raise: Error
 ]
 

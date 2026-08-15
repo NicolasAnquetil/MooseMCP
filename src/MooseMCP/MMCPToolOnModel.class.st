@@ -22,6 +22,15 @@ MMCPToolOnModel >> entityIdSchemaPropertyDescribed: aDescription [
 ]
 
 { #category : 'private - schema' }
+MMCPToolOnModel >> entityTypeSchemaPropertyDescribed: aDescription [
+
+	^ self
+		  schemaPropertyNamed: 'entityType'
+		  type: 'string'
+		  description: aDescription
+]
+
+{ #category : 'private - schema' }
 MMCPToolOnModel >> modelIdSchemaPropertyDescribed: aDescription [
 
 	^ self

@@ -46,11 +46,63 @@ MMCPCommand >> asMermaid: edges [
 					  s nextPut: Character lf ] ]
 ]
 
+{ #category : 'model access' }
+MMCPCommand >> associationTypeNamesIn: aModel [
+
+	^ aModel metamodel classes
+		  select: [ :c |
+		  c implementingClass allTraits includes: FamixTAssociation ]
+		  thenCollect: #name
+]
+
+{ #category : 'model access' }
+MMCPCommand >> checkEntityType: aTypeName in: aModel [
+
+	((self namedEntityTypeNamesIn: aModel) anySatisfy: [ :name |
+		 name sameAs: aTypeName ]) ifFalse: [
+			MCPCommandError
+				signalErrorCode: #EntityTypeUnknown
+				message: 'Unknown entity type: ' , aTypeName asString , '.'
+				details: { (#entityType -> aTypeName) } asDictionary ]
+]
+
+{ #category : 'metrics' }
+MMCPCommand >> checkMetrics: someMetricNames in: aModel [
+
+	| discoveredNames |
+	discoveredNames := self numericPropertyNamesIn: aModel.
+	someMetricNames do: [ :aMetricName |
+			((self metricSelectors includesKey: aMetricName) or: [
+				 discoveredNames anySatisfy: [ :name | name sameAs: aMetricName ] ])
+				ifFalse: [
+						MCPCommandError
+							signalErrorCode: #MetricUnknown
+							message: 'Unknown metric: ' , aMetricName asString , '.'
+							details: { (#metric -> aMetricName) } asDictionary ] ]
+]
+
+{ #category : 'model access' }
+MMCPCommand >> checkRelationshipTypes: someTypeNames in: aModel [
+
+	| validNames |
+	validNames := self associationTypeNamesIn: aModel.
+	someTypeNames do: [ :aTypeName |
+			(validNames anySatisfy: [ :name | name sameAs: aTypeName ])
+				ifFalse: [
+						MCPCommandError
+							signalErrorCode: #RelationshipTypeUnknown
+							message:
+							'Unknown relationship type: ' , aTypeName asString , '.'
+							details: { (#relationshipType -> aTypeName) } asDictionary ] ]
+]
+
 { #category : 'metrics' }
 MMCPCommand >> computeMetric: aMetricName for: anEntity [
 
 	| selector raw |
-	selector := self metricSelectors at: aMetricName ifAbsent: [ ^ nil ].
+	selector := self metricSelectors
+		            at: aMetricName
+		            ifAbsent: [ aMetricName asSymbol ].
 	raw := self safePerform: selector on: anEntity.
 	raw ifNil: [ ^ nil ].
 	(raw isKindOf: Collection) ifTrue: [ ^ raw size ].
@@ -180,6 +232,30 @@ MMCPCommand >> modelNamed: aModelId [
 	^ MooseModel root allModels
 		  detect: [ :m | m name = aModelId ]
 		  ifNone: [ Error signal: 'No model named ' , aModelId asString ]
+]
+
+{ #category : 'model access' }
+MMCPCommand >> namedEntityTypeNamesIn: aModel [
+
+	^ aModel metamodel classes
+		  select: [ :c |
+		  c implementingClass allTraits includes: FamixTNamedEntity ]
+		  thenCollect: #name
+]
+
+{ #category : 'metrics' }
+MMCPCommand >> numericPropertyNamesIn: aModel [
+
+	| names |
+	names := Set new.
+	aModel metamodel classes
+		select: [ :c |
+		c implementingClass allTraits includes: FamixTNamedEntity ]
+		thenDo: [ :c |
+				c allProperties
+					select: [ :p | p type isKindOf: FM3Number ]
+					thenDo: [ :p | names add: p name ] ].
+	^ names
 ]
 
 { #category : 'relationships' }
