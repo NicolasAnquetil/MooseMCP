@@ -30,6 +30,12 @@ MMCPTool class >> isAbstract [
 ]
 
 { #category : 'metadata' }
+MMCPTool class >> shouldAutoRegister [
+
+	^true
+]
+
+{ #category : 'metadata' }
 MMCPTool >> buildOutputSchema [
 	| schema dataProperty |
 	schema := self standardOutputSchemaForDataProperties: #() required: #().
