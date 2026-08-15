@@ -144,6 +144,42 @@ MMCPToolGetRelationshipsTest >> testLimitTruncates [
 ]
 
 { #category : 'tests' }
+MMCPToolGetRelationshipsTest >> testNilRelationshipsSourceShouldNotError [
+    "get_relationships should not crash when an association  has a nil source or target (erroneously)
+	  Here the error is an access without accessor"
+
+	| result |
+	fixture model newAccess
+		variable: fixture attribute.
+
+	result := self callToolWith: {
+		(#modelId -> self modelName).
+		(#entityId -> fixture otherMethod mooseID asString).
+		(#types -> #( 'access' )).
+		(#direction -> 'outgoing') } asDictionary.
+
+	self assert: (result at: 'edges') size equals: 1.
+]
+
+{ #category : 'tests' }
+MMCPToolGetRelationshipsTest >> testNilRelationshipsTargetShouldNotError [
+    "get_relationships should not crash when an association  has a nil source or target (erroneously)
+	  Here the error is an access without variable"
+
+	| result |
+	fixture model newAccess
+		accessor: fixture otherMethod.
+
+	result := self callToolWith: {
+		(#modelId -> self modelName).
+		(#entityId -> fixture otherMethod mooseID asString).
+		(#types -> #( 'access' )).
+		(#direction -> 'outgoing') } asDictionary.
+
+	self assert: (result at: 'edges') size equals: 1.
+]
+
+{ #category : 'tests' }
 MMCPToolGetRelationshipsTest >> testRaisesWhenEntityIdUnknown [
 
 	self
