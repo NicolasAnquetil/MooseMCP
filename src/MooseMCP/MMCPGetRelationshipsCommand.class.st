@@ -3,18 +3,31 @@ Command that resolves relationship edges for get_relationships by delegating to 
 "
 Class {
 	#name : 'MMCPGetRelationshipsCommand',
-	#superclass : 'MMCPCommand',
+	#superclass : 'MMCPModelEntityCommand',
 	#category : 'MooseMCP-Commands',
 	#package : 'MooseMCP',
 	#tag : 'Commands'
 }
 
-{ #category : 'executing' }
-MMCPGetRelationshipsCommand >> execute [
+{ #category : 'relationships' }
+MMCPGetRelationshipsCommand >> edgeType: aType from: source to: target direction: aDirection [
 
-	| modelId entityId types direction depth limit model root edges visited frontier nextFrontier effectiveTypes dir |
-	modelId := self request stringArgumentNamed: 'modelId'.
-	entityId := self request stringArgumentNamed: 'entityId'.
+	| dict |
+	dict := Dictionary new.
+	dict at: 'type' put: aType.
+	dict at: 'sourceId' put: (source ifNil: [ nil ] ifNotNil: [ :s | s mooseID asString ]).
+	dict at: 'targetId' put: (target ifNil: [ nil ] ifNotNil: [ :t | t mooseID asString ]).
+	dict at: 'direction' put: aDirection asString.
+	^ dict
+
+]
+
+{ #category : 'accessing' }
+MMCPGetRelationshipsCommand >> executeOn: model entity: entity [
+
+	| types direction depth limit root edges visited frontier nextFrontier effectiveTypes dir |
+	entity ifNil: [ ^ Error signal: 'entityId is required for get_relationships' ].
+	root := entity.
 	types := self request
 		         stringCollectionArgumentNamed: 'types'
 		         default: #( 'inheritance' 'invocation' ).
@@ -27,8 +40,6 @@ MMCPGetRelationshipsCommand >> execute [
 	limit := self request
 		         nonNegativeIntegerArgumentNamed: 'limit'
 		         default: 50.
-	model := self modelNamed: modelId.
-	root := self entityWithId: entityId in: model.
 	effectiveTypes := (types isNil or: [ types isEmpty ])
 		                  ifTrue: [ #( 'inheritance' 'invocation' ) ]
 		                  ifFalse: [ types ].
@@ -69,4 +80,50 @@ MMCPGetRelationshipsCommand >> execute [
 		  at: 'edges' put: (edges first: (edges size min: limit)) asArray;
 		  at: 'truncated' put: edges size > limit;
 		  yourself
+]
+
+{ #category : 'relationships' }
+MMCPGetRelationshipsCommand >> relatedTo: anEntity type: aType0 direction: aDirection [
+
+	| aType |
+	aType := aType0 asLowercase.
+
+	aType = 'inheritance' ifTrue: [
+			^ aDirection = #outgoing
+				  ifTrue: [
+						  (self safePerform: #superInheritances on: anEntity)
+							  ifNil: [ #(  ) ]
+							  ifNotNil: [ :c | self safeCollect: c selector: #superclass ] ]
+				  ifFalse: [
+						  (self safePerform: #subInheritances on: anEntity)
+							  ifNil: [ #(  ) ]
+							  ifNotNil: [ :c | self safeCollect: c selector: #subclass ] ] ].
+	aType = 'invocation' ifTrue: [
+			^ aDirection = #outgoing
+				  ifTrue: [
+				  (self safePerform: #invokedMethods on: anEntity) ifNil: [ #(  ) ] ]
+				  ifFalse: [
+				  (self safePerform: #invokingMethods on: anEntity) ifNil: [
+					  #(  ) ] ] ].
+	aType = 'access' ifTrue: [
+			^ aDirection = #outgoing
+				  ifTrue: [
+						  (self safePerform: #accesses on: anEntity)
+							  ifNil: [ #(  ) ]
+							  ifNotNil: [ :c | self safeCollect: c selector: #variable ] ]
+				  ifFalse: [
+						  (self safePerform: #incomingAccesses on: anEntity)
+							  ifNil: [ #(  ) ]
+							  ifNotNil: [ :c | self safeCollect: c selector: #accessor ] ] ].
+	^ (aDirection = #outgoing
+		  ifTrue: [
+		  (self safePerform: #allProviders on: anEntity) ifNil: [ #(  ) ] ]
+		  ifFalse: [
+		  (self safePerform: #allClients on: anEntity) ifNil: [ #(  ) ] ]) reject: [ :e | e isNil ]
+]
+
+{ #category : 'private' }
+MMCPGetRelationshipsCommand >> safeCollect: aCollection selector: aSelector [
+
+	^ (aCollection collect: [ :each | [ each perform: aSelector ] on: Error do: [ :ex | nil ] ]) reject: [ :e | e isNil ]
 ]

@@ -3,19 +3,19 @@ Command that resolves entities for get_entity by delegating to MMCPToolServer.
 "
 Class {
 	#name : 'MMCPGetEntityCommand',
-	#superclass : 'MMCPCommand',
+	#superclass : 'MMCPModelEntityCommand',
 	#category : 'MooseMCP-Commands',
 	#package : 'MooseMCP',
 	#tag : 'Commands'
 }
 
-{ #category : 'executing' }
-MMCPGetEntityCommand >> execute [
+{ #category : 'accessing' }
+MMCPGetEntityCommand >> executeOn: model entity: entity [
 
-	| modelId query entityId entityType exactMatch limit model candidates matches |
-	modelId := self request stringArgumentNamed: 'modelId'.
+	| query entityType exactMatch limit candidates matches |
+	entity ifNotNil: [ ^ Array with: (self describeEntity: entity) ].
+
 	query := self request stringArgumentNamed: 'query' default: ''.
-	entityId := self request stringArgumentNamed: 'entityId'.
 	entityType := self request stringArgumentNamed: 'entityType'.
 	exactMatch := self request
 		              booleanArgumentNamed: 'exactMatch'
@@ -23,10 +23,6 @@ MMCPGetEntityCommand >> execute [
 	limit := self request
 		         nonNegativeIntegerArgumentNamed: 'limit'
 		         default: 20.
-	model := self modelNamed: modelId.
-	(entityId isNil or: [ entityId isEmpty ]) ifFalse: [
-			^ Array with:
-				  (self describeEntity: (self entityWithId: entityId in: model)) ].
 	candidates := (entityType isNil or: [ entityType isEmpty ])
 		              ifTrue: [ model entityStorage ]
 		              ifFalse: [
@@ -34,12 +30,10 @@ MMCPGetEntityCommand >> execute [
 				              self entitiesOfType: entityType in: model ].
 	matches := (candidates select: [ :e |
 			            | name |
-			            name := (self safePerform: #mooseName on: e) ifNil: [
-				                    '' ].
+			            name := (self safePerform: #mooseName on: e) ifNil: [ '' ].
 			            exactMatch
 				            ifTrue: [ name = query ]
-				            ifFalse: [
-				            name asLowercase includesSubstring: query asLowercase ] ])
+				            ifFalse: [ name asLowercase includesSubstring: query asLowercase ] ])
 		           asOrderedCollection.
 	^ ((matches first: (matches size min: limit)) collect: [ :e |
 		   self describeEntity: e ]) asArray
